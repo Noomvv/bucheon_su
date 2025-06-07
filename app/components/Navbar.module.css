@@ -1,68 +1,51 @@
+/* app/components/Navbar.module.css */
 .navbar {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  width: 100%;
-  background-color: rgb(255, 255, 255);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  display: flex;
-  justify-content: center;
+  background-color: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
   padding: 12px 0;
   z-index: 1000;
-  border-top-left-radius: 16px;
-  border-top-right-radius: 16px;
-  box-shadow: 0 -2px 15px rgba(0, 0, 0, 0.08);
-  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  display: flex;
+  justify-content: center;
 }
 
-.btnGrid {
+.iconGrid {
   display: flex;
   width: 100%;
-  max-width: 500px;
-  margin: 0 auto;
+  max-width: 400px;
   justify-content: space-around;
-  padding: 0 8px;
 }
 
-.btn {
+.iconButton {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  text-decoration: none;
-  color: #444;
-  font-size: 0.7rem;
-  flex: 1;
-  padding: 6px 2px;
-  transition: all 0.25s ease;
-  border-radius: 8px;
-  margin: 0 2px;
-  min-width: 50px;
-  max-width: 80px;
-}
-
-.btn:hover {
-  background-color: rgba(0, 0, 0, 0.03);
-  color: var(--main-color);
-  transform: translateY(-2px);
-}
-
-.btn:active {
-  transform: translateY(0);
-  background-color: rgba(0, 0, 0, 0.05);
-}
-
-.btn svg {
-  font-size: 1.3rem;
-  margin-bottom: 4px;
+  justify-content: center;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  color: #4b5563;
+  font-size: 1.6rem;
   transition: all 0.2s ease;
+  position: relative;
 }
 
-/* Активное состояние */
+.iconButton:hover {
+  background-color: rgba(79, 70, 229, 0.05);
+  color: var(--main-color);
+  transform: translateY(-3px);
+}
+
+.iconButton:active {
+  transform: translateY(0);
+}
+
 .active {
   color: var(--main-color);
-  position: relative;
 }
 
 .active::after {
@@ -77,32 +60,11 @@
   background-color: var(--main-color);
 }
 
-/* Адаптация для очень маленьких экранов */
-@media (max-width: 350px) {
-  .btn {
-    font-size: 0.65rem;
-    padding: 6px 1px;
-  }
-  
-  .btn svg {
-    font-size: 1.2rem;
-  }
-}
-
-/* Планшеты и большие телефоны */
-@media (min-width: 500px) {
-  .navbar {
-    padding: 14px 0;
-    border-top-left-radius: 20px;
-    border-top-right-radius: 20px;
-  }
-  
-  .btn {
-    font-size: 0.75rem;
-    padding: 8px 4px;
-  }
-  
-  .btn svg {
+/* Адаптация для маленьких экранов */
+@media (max-width: 400px) {
+  .iconButton {
+    width: 44px;
+    height: 44px;
     font-size: 1.4rem;
   }
 }

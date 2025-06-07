@@ -1,5 +1,5 @@
-export default function Home() {
+export default function Polls() {
   return (
-    <h1>Text</h1>
+    <h1>тут опросы будут</h1>
   )
 }

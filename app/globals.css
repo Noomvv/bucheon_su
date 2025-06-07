@@ -18,6 +18,6 @@ body {
     background-color: var(--bg-color);
     color: var(--text-color);
     line-height: 1.6;
-    padding-top: 15%;
+    margin-top: 20%;
     padding-bottom: 70px; /* Отступ для навигационной панели */
 }

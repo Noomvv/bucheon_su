@@ -1,5 +1,5 @@
-export default function Home() {
+export default function Members() {
   return (
-    <h1>Text</h1>
+    <h1>Здесь будем мы</h1>
   )
 }

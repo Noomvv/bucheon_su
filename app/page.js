@@ -1,5 +1,5 @@
 export default function Home() {
   return (
-    <h1>Студенческий актив</h1>
+    <h1>Это главная страница</h1>
   )
 }

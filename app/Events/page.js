@@ -1,5 +1,5 @@
-export default function Home() {
+export default function Events() {
   return (
-    <h1>События</h1>
+    <h1>Тут будет календарь мероприятий</h1>
   )
 }

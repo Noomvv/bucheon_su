@@ -1,5 +1,5 @@
-export default function Home() {
+export default function Ideas() {
   return (
-    <h1>Text</h1>
+    <h1>Здесь вы сможете предложить свою идею</h1>
   )
 }
