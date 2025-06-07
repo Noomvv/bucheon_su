@@ -1,15 +1,21 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import { FaUsers, FaCalendarAlt, FaHome, FaPoll, FaLightbulb } from 'react-icons/fa';
+import {
+  HomeIcon,
+  UserGroupIcon,
+  CalendarIcon,
+  ChartBarIcon,
+  LightBulbIcon
+} from '@heroicons/react/24/outline';
 import styles from './Header.module.css';
 
 const pageData = {
-  '/': { title: 'Студенческий актив', icon: <FaHome /> },
-  '/Members': { title: 'Участники', icon: <FaUsers /> },
-  '/Events': { title: 'События', icon: <FaCalendarAlt /> },
-  '/Polls': { title: 'Опросы', icon: <FaPoll /> },
-  '/Ideas': { title: 'Идеи', icon: <FaLightbulb /> },
+  '/': { title: 'Студенческий актив', icon: <HomeIcon className={styles.icon} /> },
+  '/Members': { title: 'Участники', icon: <UserGroupIcon className={styles.icon} /> },
+  '/Events': { title: 'События', icon: <CalendarIcon className={styles.icon} /> },
+  '/Polls': { title: 'Опросы', icon: <ChartBarIcon className={styles.icon} /> },
+  '/Ideas': { title: 'Идеи', icon: <LightBulbIcon className={styles.icon} /> },
 };
 
 export default function Header() {
@@ -20,7 +26,7 @@ export default function Header() {
     <header className={styles.header}>
       <div className={styles.container}>
         <div className={styles.titleWrapper}>
-          <span className={styles.icon}>{icon}</span>
+          <span className={styles.iconWrapper}>{icon}</span>
           <h1 className={styles.title}>{title}</h1>
         </div>
       </div>

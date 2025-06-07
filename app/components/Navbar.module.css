@@ -4,20 +4,21 @@
   bottom: 0;
   left: 0;
   right: 0;
-  background-color: rgba(255, 255, 255, 0.98);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border-top: 1px solid rgba(0, 0, 0, 0.05);
   padding: 12px 0;
   z-index: 1000;
   display: flex;
   justify-content: center;
+  /* margin-bottom: 20px; */
 }
 
 .iconGrid {
   display: flex;
   width: 100%;
-  max-width: 400px;
+  max-width: 360px;
   justify-content: space-around;
 }
 
@@ -25,46 +26,49 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
+  width: 54px;
+  height: 54px;
+  border-radius: 12px;
+  transition: all 0.25s ease;
+}
+
+.icon {
+  width: 26px;
+  height: 26px;
   color: #4b5563;
-  font-size: 1.6rem;
   transition: all 0.2s ease;
-  position: relative;
 }
 
 .iconButton:hover {
-  background-color: rgba(79, 70, 229, 0.05);
-  color: var(--main-color);
-  transform: translateY(-3px);
+  background: rgba(79, 70, 229, 0.05);
 }
 
-.iconButton:active {
-  transform: translateY(0);
+.iconButton:hover .icon {
+  color: var(--main-color);
+  transform: scale(1.1);
 }
 
 .active {
+  background: rgba(79, 70, 229, 0.08);
+}
+
+.active .icon {
   color: var(--main-color);
 }
 
-.active::after {
-  content: '';
-  position: absolute;
-  bottom: -8px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background-color: var(--main-color);
-}
-
-/* Адаптация для маленьких экранов */
+/* Адаптация для мобильных */
 @media (max-width: 400px) {
+  .navbar {
+    padding: 10px 0;
+  }
+  
   .iconButton {
-    width: 44px;
-    height: 44px;
-    font-size: 1.4rem;
+    width: 48px;
+    height: 48px;
+  }
+  
+  .icon {
+    width: 24px;
+    height: 24px;
   }
 }
