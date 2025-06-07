@@ -1,0 +1,57 @@
+.header {
+  position: sticky;
+  top: 0;
+  background: #ffffff;
+  padding: 1.2rem 0;
+  z-index: 100;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); /* Увеличена жесткость тени */
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+/* Заголовок с иконкой */
+.titleWrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.icon {
+  color: var(--main-color); /* Фиолетовый акцент */
+  font-size: 1.4rem;
+  opacity: 0.9;
+}
+
+.title {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #1f2937; /* Темно-серый */
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+/* Легкий hover-эффект для иконки */
+.icon:hover {
+  opacity: 1;
+  transform: scale(1.05);
+  transition: all 0.2s ease;
+}
+
+/* Адаптация под мобильные */
+@media (max-width: 640px) {
+  .header {
+    padding: 1rem 0;
+  }
+
+  .title {
+    font-size: 1.15rem;
+  }
+
+  .icon {
+    font-size: 1.2rem;
+  }
+}
