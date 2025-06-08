@@ -1,0 +1,4 @@
+.info {
+    display: flex;
+    padding: 10px; /* Внутренние отступы */
+}

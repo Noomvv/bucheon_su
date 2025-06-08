@@ -2,6 +2,8 @@
     --main-color: #F0973D; /* Основной цвет */
     --bg-color: #fff; /* Цвет фона */
     --text-color: rgb(92, 92, 92); /* Цвет текста */
+    --border-color: #e7cc9d; /* Цвет границы */
+    --accent-color: #ff8000; /* Акцентный цвет */
 }
 
 html {
