@@ -5,37 +5,39 @@
   justify-content: start;
   padding: 20px 0;
   background: var(--bg-color);
+  width: 100%; /* Форма занимает всю ширину */
 }
 
 .form {
-  width: 100%;
-  max-width: 360px;
+  width: 100%; /* Форма занимает всю ширину */
+  max-width: 100%; /* Убираем ограничение ширины */
   display: flex;
   flex-direction: column;
   gap: 16px;
   background: var(--bg-color);
   padding: 20px;
-  /* border-radius: 20px; */
   box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.25);
 }
 
-.input {
-  width: 100%;
+.input,
+.select {
+  width: 100%; /* Инпуты и селекторы занимают всю ширину формы */
   padding: 12px 14px;
   border: 0.5px solid var(--main-color);
   border-radius: 12px;
   font-size: 14px;
   color: var(--text-color);
   outline: none;
-  transition: --main-color 0.2s;
+  transition: border-color 0.2s;
 }
 
-.input:focus {
+.input:focus,
+.select:focus {
   border-color: var(--accent-color);
 }
 
 .textarea {
-  width: 100%;
+  width: 100%; /* Текстовое поле также занимает всю ширину */
   padding: 12px 14px;
   border: 0.5px solid var(--main-color);
   border-radius: 12px;
@@ -65,7 +67,7 @@
 }
 
 .button:not(:disabled):hover {
-  background: var(--accent-color); /* Укажите более темный цвет вручную */
+  background: var(--accent-color);
   transform: translateY(-1px);
 }
 
