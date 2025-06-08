@@ -6,6 +6,7 @@
   border-bottom: 1px solid #e5e7eb;
   padding: 1.2rem 0;
   z-index: 900;
+  margin-bottom: 20px;
   box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.25);
 }
 

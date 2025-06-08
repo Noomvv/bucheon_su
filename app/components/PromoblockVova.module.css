@@ -1,0 +1,35 @@
+.promoWrapper {
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+  margin: 20px auto;
+}
+
+.promoBlock {
+  background-color: var(--main-color);
+  color: var(--text-color);
+  border-radius: 16px;
+  box-shadow: 0 8px 24px black;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  padding: 20px;
+  padding-left: 120px; /* space for image */
+}
+
+.promoText {
+  font-size: 1.125rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.promoImageOverlap {
+  position: absolute;
+  bottom: -10px;
+  left: 0;
+  width: 100px;
+  height: auto;
+  z-index: 1;
+  border-radius: 50%;
+  box-shadow: 0 4px 12px var(--shadow-color);
+}
