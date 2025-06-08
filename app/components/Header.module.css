@@ -1,7 +1,7 @@
 /* app/components/Header.module.css */
 .header {
   position: sticky;
-  top: 40px;
+  top: 0; /* Размещаем header в самом верху */
   background: #ffffff;
   border-bottom: 1px solid #e5e7eb;
   padding: 1.2rem 0;
@@ -43,7 +43,7 @@
 /* Адаптация */
 @media (max-width: 640px) {
   .header {
-    top: 20px;
+    top: 0px;
     padding: 1rem 0;
     box-shadow: 0 8px 20px -4px rgba(0, 0, 0, 0.2);
   }

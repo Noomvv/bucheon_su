@@ -22,6 +22,6 @@ body {
     background-color: var(--bg-color);
     color: var(--text-color);
     line-height: 1.6;
-    padding-top: 35px; /* Отступ сверху для header */
     padding-bottom: 70px; /* Отступ для навигационной панели */
+    margin: 0; /* Убираем любые внешние отступы */
 }

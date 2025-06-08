@@ -12,13 +12,14 @@
   z-index: 1000;
   display: flex;
   justify-content: center;
-  margin-bottom: 20px;
+  /* margin-bottom: 20px; */
 }
 
 .iconGrid {
   display: flex;
   width: 100%;
   justify-content: space-between; /* Равномерное распределение кнопок */
+  padding-bottom: 20px;
 }
 
 .iconButton {
