@@ -1,13 +1,14 @@
 import ApplicationForm from "../components/ApplicationForm"
 import PromoblockVova from "../components/PromoblockVova";
-import styles from "./page.module.css";
+import Information from "../components/Information";
+
 
 export default function Ideas() {
   return (
     <div>
-        <p className={styles.info}>Есть предложение, как сделать универ лучше? Заполняй форму — мы всё читаем и обсуждаем!</p>
+        <Information />
         <ApplicationForm title="Идеи" description="Здесь можно предложить идею для нашего сообщества" />
-        {/* <PromoblockVova /> */}
+        <PromoblockVova />
     </div>
   )
 }

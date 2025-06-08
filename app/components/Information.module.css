@@ -1,0 +1,12 @@
+.container {
+    width: 95%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px; /* Внутренние отступы */
+    background: var(--block-color); /* Цвет фона */
+    border-radius: 12px; /* Скругленные углы */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Тени */
+    margin: 0 auto; /* Центрирование по горизонтали */
+    position: relative; /* Убедитесь, что контейнер позиционируется относительно страницы */
+}
