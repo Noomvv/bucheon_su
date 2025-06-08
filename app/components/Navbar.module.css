@@ -18,15 +18,14 @@
 .iconGrid {
   display: flex;
   width: 100%;
-  max-width: 360px;
-  justify-content: space-around;
+  justify-content: space-between; /* Равномерное распределение кнопок */
 }
 
 .iconButton {
+  flex: 1; /* Каждая кнопка занимает равную часть ширины */
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 54px;
   height: 54px;
   border-radius: 12px;
   transition: all 0.25s ease;
