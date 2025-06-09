@@ -4,6 +4,7 @@ import { usePathname } from 'next/navigation';
 import {
   HomeIcon,
   UserIcon,
+  UserGroupIcon,
   CalendarIcon,
   ChartBarIcon,
   LightBulbIcon
@@ -16,7 +17,7 @@ const pageData = {
   '/Events': { title: 'События', icon: <CalendarIcon className={styles.icon} /> },
   '/Polls': { title: 'Опросы', icon: <ChartBarIcon className={styles.icon} /> },
   '/Ideas': { title: 'Идеи', icon: <LightBulbIcon className={styles.icon} /> },
-  '/Members': { title: 'Состав совета', icon: <LightBulbIcon className={styles.icon} /> },
+  '/Members': { title: 'Состав совета', icon: <UserGroupIcon className={styles.icon} /> },
 };
 
 export default function Header() {
