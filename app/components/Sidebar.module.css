@@ -3,10 +3,15 @@
   border: none;
   cursor: pointer;
   font-size: 1.5rem;
+  color: #111827;
   position: fixed;
-  top: 1.5rem;
+  top: 1.2rem;
   right: 1.5rem;
   z-index: 1100;
+}
+
+.menuButton:focus {
+  outline: none; /* Убираем стандартный фокус */
 }
 
 .sidebar {
