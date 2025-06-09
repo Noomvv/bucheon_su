@@ -3,7 +3,7 @@
 import { usePathname } from 'next/navigation';
 import {
   HomeIcon,
-  UserGroupIcon,
+  UserIcon,
   CalendarIcon,
   ChartBarIcon,
   LightBulbIcon
@@ -12,10 +12,11 @@ import styles from './Header.module.css';
 
 const pageData = {
   '/': { title: 'Студенческий актив', icon: <HomeIcon className={styles.icon} /> },
-  '/Members': { title: 'Участники', icon: <UserGroupIcon className={styles.icon} /> },
+  '/Personal': { title: 'Личный кабинет', icon: <UserIcon className={styles.icon} /> },
   '/Events': { title: 'События', icon: <CalendarIcon className={styles.icon} /> },
   '/Polls': { title: 'Опросы', icon: <ChartBarIcon className={styles.icon} /> },
   '/Ideas': { title: 'Идеи', icon: <LightBulbIcon className={styles.icon} /> },
+  '/Members': { title: 'Состав совета', icon: <LightBulbIcon className={styles.icon} /> },
 };
 
 export default function Header() {

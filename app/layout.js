@@ -2,6 +2,7 @@ import { Montserrat } from "next/font/google";
 import "./globals.css";
 import Navbar from "./components/Navbar"
 import Header from "./components/Header";
+import Sidebar from './components/Sidebar';
 
 const montserrat = Montserrat({
   variable: "--font-montserrat",
@@ -17,8 +18,10 @@ export default function RootLayout({ children }) {
   return (
     <html lang="ru">
       <body className={montserrat.variable}>
-        <Header />
-        {children}
+        <Sidebar>
+          <Header />
+          {children}
+        </Sidebar>
         <Navbar />
       </body>
     </html>
