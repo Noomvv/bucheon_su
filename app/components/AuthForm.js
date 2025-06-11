@@ -1,28 +1,26 @@
 // app/components/AuthForm.js
 'use client'
+
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { supabase } from '../../lib/supabaseClient'
-
-const PASS_RE = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/
+import { supabase }  from '../../lib/supabaseClient'
 
 export default function AuthForm() {
   const router = useRouter()
-  const [mode, setMode]       = useState('login')   // 'login' или 'register'
-  const [studentId, setId]    = useState('')
-  const [login, setLogin]     = useState('')
-  const [password, setPass]   = useState('')
-  const [confirm, setConfirm] = useState('')
-  const [error, setError]     = useState('')
-  const [loading, setLoading] = useState(false)
+  const [mode, setMode]         = useState('login')   // 'login' | 'register'
+  const [studentId, setStudentId] = useState('')
+  const [login, setLogin]       = useState('')
+  const [password, setPassword] = useState('')
+  const [confirm, setConfirm]   = useState('')
+  const [error, setError]       = useState('')
+  const [loading, setLoading]   = useState(false)
 
   const switchMode = () => {
-    setError('')
-    setLoading(false)
+    setError(''); setLoading(false)
     setMode(mode === 'login' ? 'register' : 'login')
   }
 
-  async function handleLogin(e) {
+  const handleLogin = async e => {
     e.preventDefault()
     setError(''); setLoading(true)
     const { error } = await supabase.auth.signInWithPassword({
@@ -33,22 +31,27 @@ export default function AuthForm() {
     if (error) {
       setError(error.message)
     } else {
-      router.refresh()   // ← перезагружаем страницу, чтобы PersonalPage увидел новую сессию
+      router.push('/Personal')
     }
   }
 
-  async function handleRegister(e) {
+  const handleRegister = async e => {
     e.preventDefault()
     setError('')
 
     const idNum = parseInt(studentId.trim(), 10)
-    if (isNaN(idNum))             return setError('Неверный Student ID')
-    if (!PASS_RE.test(password))  return setError('Пароль ≥8 символов, буквы+цифры')
-    if (password !== confirm)     return setError('Пароли не совпадают')
+    if (isNaN(idNum)) {
+      return setError('Неверный Student ID')
+    }
+    if (password.length < 8 || !/\d/.test(password) || !/[A-Za-z]/.test(password)) {
+      return setError('Пароль ≥8 символов, буквы и цифры')
+    }
+    if (password !== confirm) {
+      return setError('Пароли не совпадают')
+    }
 
     setLoading(true)
-
-    // --- проверка и регистрация как было ---
+    // проверка студента
     const { data: stud, error: e1 } = await supabase
       .from('students')
       .select('auth_user_id')
@@ -63,6 +66,7 @@ export default function AuthForm() {
       return setError('Уже зарегистрирован')
     }
 
+    // регистрация
     const { data: sd, error: e2 } = await supabase.auth.signUp({
       email: login,
       password
@@ -72,6 +76,7 @@ export default function AuthForm() {
       return setError(e2.message)
     }
 
+    // привязка к students
     const { error: e3 } = await supabase
       .from('students')
       .update({ auth_user_id: sd.user.id, email: login })
@@ -91,25 +96,26 @@ export default function AuthForm() {
       return setError(e4.message)
     }
 
-    router.refresh()  // ← и здесь тоже вызываем, чтобы форма убралась
+    router.push('/Personal')
   }
 
   return (
     <div style={{ maxWidth: 360, margin: '40px auto', padding: 20 }}>
       <h2 style={{ textAlign: 'center' }}>
-        {mode === 'login' ? 'Вход' : 'Регистрация'}
+        {mode === 'login' ? 'Вход в систему' : 'Регистрация'}
       </h2>
+
       <form
         onSubmit={mode === 'login' ? handleLogin : handleRegister}
         style={{ display: 'grid', gap: 12 }}
       >
         {mode === 'register' && (
           <label>
-            Student ID:
+            Student ID:<br/>
             <input
               type="text"
               value={studentId}
-              onChange={e => setId(e.target.value)}
+              onChange={e => setStudentId(e.target.value)}
               required
               style={{ width: '100%', padding: 8 }}
             />
@@ -117,7 +123,7 @@ export default function AuthForm() {
         )}
 
         <label>
-          Логин:
+          Логин:<br/>
           <input
             type="text"
             value={login}
@@ -128,11 +134,11 @@ export default function AuthForm() {
         </label>
 
         <label>
-          Пароль:
+          Пароль:<br/>
           <input
             type="password"
             value={password}
-            onChange={e => setPass(e.target.value)}
+            onChange={e => setPassword(e.target.value)}
             required
             style={{ width: '100%', padding: 8 }}
           />
@@ -140,7 +146,7 @@ export default function AuthForm() {
 
         {mode === 'register' && (
           <label>
-            Подтвердите пароль:
+            Подтвердите пароль:<br/>
             <input
               type="password"
               value={confirm}
@@ -172,6 +178,7 @@ export default function AuthForm() {
             : 'Зарегистрироваться'}
         </button>
       </form>
+
       <p style={{ textAlign: 'center', marginTop: 12 }}>
         {mode === 'login' ? 'Нет аккаунта?' : 'Есть аккаунт?'}{' '}
         <button

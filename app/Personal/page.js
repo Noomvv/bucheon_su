@@ -1,48 +1,58 @@
+// app/Personal/page.js
 'use client'
+
 import { useState, useEffect } from 'react'
 import { supabase }            from '../../lib/supabaseClient'
 import AuthForm                from '../components/AuthForm'
 import LogoutButton            from '../components/LogoutButton'
 
 export default function PersonalPage() {
-  const [session, setSession] = useState(null)
-  const [student, setStudent] = useState(null)
-  const [loading, setLoading] = useState(true)
+  const [sessionChecked, setSessionChecked] = useState(false)
+  const [session, setSession]               = useState(null)
+  const [student, setStudent]               = useState(null)
 
-  // 1) Получаем сессию при монтировании
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
       setSession(data.session)
-      setLoading(false)
+      setSessionChecked(true)
+      if (data.session) {
+        supabase
+          .from('students')
+          .select('firstname')
+          .eq('auth_user_id', data.session.user.id)
+          .single()
+          .then(({ data }) => setStudent(data))
+      }
     })
 
     const { data: sub } = supabase.auth.onAuthStateChange((_, newSession) => {
       setSession(newSession)
       setStudent(null)
+      setSessionChecked(true)
+      if (newSession) {
+        supabase
+          .from('students')
+          .select('firstname')
+          .eq('auth_user_id', newSession.user.id)
+          .single()
+          .then(({ data }) => setStudent(data))
+      }
     })
     return () => sub.subscription.unsubscribe()
   }, [])
 
-  // 2) Если есть сессия, подтягиваем имя студента
-  useEffect(() => {
-    if (!session) return
-    supabase
-      .from('students')
-      .select('firstname')
-      .eq('auth_user_id', session.user.id)
-      .single()
-      .then(({ data }) => setStudent(data))
-  }, [session])
+  if (!sessionChecked) {
+    // Пока не проверили сессию — показываем форму (или можете показать loader)
+    return <AuthForm />
+  }
 
-  if (loading) return <p>Загрузка…</p>
-
-  // 3) Нет сессии — показываем форму логина/регистрации
+  // Если нет сессии — форма
   if (!session) {
     return <AuthForm />
   }
 
-  // 4) Есть сессия и студент найден — приветствие
-  if (student) {
+  // Если есть сессия и имя подтянулось — приветствие
+  if (student?.firstname) {
     return (
       <div style={{ textAlign: 'center', marginTop: 50 }}>
         <h2>Привет, {student.firstname}!</h2>
@@ -51,6 +61,6 @@ export default function PersonalPage() {
     )
   }
 
-  // 5) Есть сессия, но студент ещё не привязан (shouldn't happen) — показываем AuthForm
+  // На всякий случай — показываем форму
   return <AuthForm />
 }
