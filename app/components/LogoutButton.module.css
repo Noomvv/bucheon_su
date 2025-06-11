@@ -1,0 +1,43 @@
+.logoutBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.2rem;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: #dc2626; /* Красный для опасного действия */
+  background-color: transparent;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  line-height: 1;
+  margin-top: 1rem;
+}
+
+.logoutBtn:hover {
+  background-color: #fee2e2; /* Светло-красный фон */
+  border-color: #fca5a5;
+  color: #b91c1c; /* Более темный красный */
+}
+
+.logoutBtn:active {
+  transform: scale(0.98);
+}
+
+.logoutBtn:focus-visible {
+  outline: 2px solid #f87171;
+  outline-offset: 2px;
+}
+
+.icon {
+  width: 1.1em;
+  height: 1.1em;
+  stroke-width: 2;
+  transition: transform 0.2s ease;
+}
+
+.logoutBtn:hover .icon {
+  transform: translateX(2px);
+}
