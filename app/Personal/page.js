@@ -80,12 +80,12 @@ export default function PersonalPage() {
         <div className={styles.stats}>
           <div className={styles.statCard}>
             <div className={styles.statValue}>{stats.courses}</div>
-            <div className={styles.statLabel}>Активных курсов</div>
+            <div className={styles.statLabel}>Тут будет что-то</div>
           </div>
           
           <div className={styles.statCard}>
             <div className={styles.statValue}>{stats.progress}%</div>
-            <div className={styles.statLabel}>Общий прогресс</div>
+            <div className={styles.statLabel}>А может и нет</div>
           </div>
         </div>
 
