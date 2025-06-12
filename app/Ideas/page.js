@@ -1,14 +1,22 @@
-import ApplicationForm from "../components/ApplicationForm"
-import PromoblockVova from "../components/PromoblockVova";
-import Information from "../components/Information";
+// app/Ideas/page.js
+'use client'
 
+import { useState } from 'react'
+import IdeaForm     from '../components/IdeaForm'
+import IdeaList     from '../components/IdeaList'
 
-export default function Ideas() {
+export default function IdeasPage() {
+  const [refreshKey, setRefreshKey] = useState(0)
+
   return (
-    <div>
-        <Information />
-        <ApplicationForm title="Идеи" description="Здесь можно предложить идею для нашего сообщества" />
-        <PromoblockVova />
+    <div style={{ maxWidth: 600, margin: '0 auto', padding: 20 }}>
+      <h1>Предложения по улучшению</h1>
+
+      {/* Форма для добавления новой идеи */}
+      <IdeaForm onSuccess={() => setRefreshKey(k => k + 1)} />
+
+      {/* Список идей с пагинацией и фильтрацией */}
+      <IdeaList key={refreshKey} />
     </div>
   )
 }
