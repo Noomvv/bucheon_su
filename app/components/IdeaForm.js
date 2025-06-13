@@ -115,9 +115,9 @@ export default function IdeaForm({ onSuccess }) {
         )}
 
         <div className={styles.inputGroup}>
-          <label htmlFor="category" className={styles.label}>
+          {/* <label htmlFor="category" className={styles.label}>
             Категория:
-          </label>
+          </label> */}
           <div className={styles.selectContainer}>
             <select
               id="category"
@@ -127,7 +127,7 @@ export default function IdeaForm({ onSuccess }) {
               className={styles.select}
               disabled={loading}
             >
-              <option value="">— выберите категорию —</option>
+              <option value="">Выберите категорию</option>
               {categories.map(c => (
                 <option key={c} value={c}>{c}</option>
               ))}
@@ -137,9 +137,9 @@ export default function IdeaForm({ onSuccess }) {
         </div>
 
         <div className={styles.inputGroup}>
-          <label htmlFor="content" className={styles.label}>
+          {/* <label htmlFor="content" className={styles.label}>
             Текст идеи:
-          </label>
+          </label> */}
           <textarea
             id="content"
             value={content}

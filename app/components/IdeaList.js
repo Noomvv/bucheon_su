@@ -85,48 +85,55 @@ export default function IdeaList() {
 
   // Оптимистичное голосование
   const handleVote = async (ideaId, voteValue) => {
+    // Проверяем авторизацию перед обновлением состояния
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      alert('Чтобы голосовать, пожалуйста, войдите или зарегистрируйтесь.');
+      return; // Прерываем выполнение, если пользователь не авторизован
+    }
+
+    const userId = session.user.id;
+
     // Обновляем локально
     setIdeas(prev =>
       prev.map(idea => {
-        if (idea.id !== ideaId) return idea
-        let { likes, dislikes, myVote } = idea
+        if (idea.id !== ideaId) return idea;
+        let { likes, dislikes, myVote } = idea;
         if (myVote === voteValue) {
-          // убираем голос
-          if (voteValue === 1) likes--
-          else dislikes--
-          myVote = 0
+          // Убираем голос
+          if (voteValue === 1) likes--;
+          else dislikes--;
+          myVote = 0;
         } else {
-          // ставим/меняем голос
+          // Ставим/меняем голос
           if (myVote === 0) {
-            voteValue === 1 ? likes++ : dislikes++
+            voteValue === 1 ? likes++ : dislikes++;
           } else {
-            if (voteValue === 1) { likes++; dislikes-- }
-            else               { dislikes++; likes-- }
+            if (voteValue === 1) {
+              likes++;
+              dislikes--;
+            } else {
+              dislikes++;
+              likes--;
+            }
           }
-          myVote = voteValue
+          myVote = voteValue;
         }
-        return { ...idea, likes, dislikes, myVote }
+        return { ...idea, likes, dislikes, myVote };
       })
-    )
+    );
 
     // Сохраняем на бэкенде
-    const { data: { session } } = await supabase.auth.getSession()
-    if (!session) {
-      alert('Чтобы голосовать, пожалуйста, войдите или зарегистрируйтесь.')
-      return
-    }
-    const userId = session.user.id
-
     const { data: existing, error: fetchErr } = await supabase
       .from('idea_votes')
       .select('vote')
       .eq('idea_id', ideaId)
       .eq('user_id', userId)
-      .single()
+      .single();
 
     if (fetchErr && fetchErr.code !== 'PGRST116') {
-      console.error('Error checking existing vote', fetchErr)
-      return
+      console.error('Error checking existing vote', fetchErr);
+      return;
     }
 
     if (existing) {
@@ -135,18 +142,18 @@ export default function IdeaList() {
           .from('idea_votes')
           .delete()
           .eq('idea_id', ideaId)
-          .eq('user_id', userId)
+          .eq('user_id', userId);
       } else {
         await supabase
           .from('idea_votes')
           .update({ vote: voteValue })
           .eq('idea_id', ideaId)
-          .eq('user_id', userId)
+          .eq('user_id', userId);
       }
     } else {
       await supabase
         .from('idea_votes')
-        .insert({ idea_id: ideaId, user_id: userId, vote: voteValue })
+        .insert({ idea_id: ideaId, user_id: userId, vote: voteValue });
     }
   }
 
