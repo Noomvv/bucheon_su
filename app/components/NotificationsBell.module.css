@@ -1,0 +1,198 @@
+.wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+/* Кнопка */
+.bellButton {
+  position: relative;
+  background: var(--bg-color);
+  border: none;
+  cursor: pointer;
+  padding: 8px 14px;
+  font-size: 16px;
+  color: var(--text-color);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  border-radius: 50px;
+  box-shadow: 
+    0 2px 6px rgba(0, 0, 0, 0.08),
+    0 1px 2px rgba(0, 0, 0, 0.05);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.bellButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.12),
+    0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+.bellButton.active {
+  background-color: rgba(240, 151, 61, 0.1);
+}
+
+/* Иконка колокольчика */
+.bellIcon {
+  width: 22px;
+  height: 22px;
+  color: var(--text-color);
+  transition: transform 0.3s ease;
+}
+
+.bellButton:hover .bellIcon {
+  animation: shake 0.6s ease;
+}
+
+@keyframes shake {
+  0%, 100% { transform: rotate(0); }
+  20% { transform: rotate(-15deg); }
+  40% { transform: rotate(15deg); }
+  60% { transform: rotate(-10deg); }
+  80% { transform: rotate(10deg); }
+}
+
+/* Счетчик */
+.counter {
+  background-color: var(--accent-color);
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: bold;
+  position: absolute;
+  top: -4px;
+  right: -4px;
+}
+
+/* Выпадающий список */
+.dropdown {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 10px);
+  width: 320px;
+  background: var(--bg-color);
+  border-radius: 16px;
+  box-shadow: 
+    0 12px 24px -8px rgba(0, 0, 0, 0.15),
+    0 4px 12px rgba(0, 0, 0, 0.1);
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.3s ease-out;
+  pointer-events: none;
+  z-index: 100;
+  overflow: hidden;
+}
+
+.dropdown.show {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* Шапка */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  background-color: rgba(240, 151, 61, 0.05);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+}
+
+.header h3 {
+  margin: 0;
+  font-size: 16px;
+  color: var(--text-color);
+  font-weight: 600;
+}
+
+.countBadge {
+  background: var(--accent-color);
+  color: white;
+  padding: 2px 10px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: bold;
+}
+
+/* Список уведомлений */
+.list {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.notification {
+  display: flex;
+  gap: 14px;
+  padding: 14px 20px;
+  transition: background 0.2s ease;
+  position: relative;
+}
+
+.notification:hover {
+  background: rgba(240, 151, 61, 0.03);
+}
+
+.notification:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 20px;
+  right: 20px;
+  height: 1px;
+  background: rgba(0, 0, 0, 0.03);
+}
+
+.notificationDot {
+  flex-shrink: 0;
+  width: 8px;
+  height: 8px;
+  background: var(--accent-color);
+  border-radius: 50%;
+  margin-top: 6px;
+}
+
+.notificationText {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text-color);
+}
+
+/* Пустое состояние */
+.empty {
+  text-align: center;
+  padding: 30px 24px;
+}
+
+.emptyIcon {
+  width: 48px;
+  height: 48px;
+  color: var(--text-color);
+  opacity: 0.4;
+  margin-bottom: 16px;
+}
+
+.empty p {
+  margin: 0;
+  color: var(--text-color);
+  opacity: 0.7;
+  font-size: 14px;
+}
+
+/* Адаптив */
+@media (max-width: 480px) {
+  .dropdown {
+    width: 280px;
+    right: -10px;
+  }
+  
+  .bellButton {
+    padding: 8px 12px;
+  }
+}

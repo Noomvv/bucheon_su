@@ -1,8 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { supabase }             from '../../lib/supabaseClient'
-import Link                     from 'next/link'
+import { supabase } from '../../lib/supabaseClient'
+import Link from 'next/link'
+import styles from './IdeaForm.module.css'
 
 const STATIC_CATEGORIES = [
   'Образование',
@@ -14,146 +15,157 @@ const STATIC_CATEGORIES = [
 ]
 
 export default function IdeaForm({ onSuccess }) {
-  const [studentId, setStudentId]   = useState(null)
+  const [studentId, setStudentId] = useState(null)
   const [dbCategories, setDbCategories] = useState([])
-  const [category, setCategory]     = useState('')
-  const [content, setContent]       = useState('')
-  const [loading, setLoading]       = useState(false)
-  const [error, setError]           = useState('')
+  const [category, setCategory] = useState('')
+  const [content, setContent] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
 
-  // 1) Узнаём student_id текущего пользователя
+  // Получаем student_id текущего пользователя
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      const user = data.session?.user
+    const fetchStudentId = async () => {
+      const { data: sessionData } = await supabase.auth.getSession()
+      const user = sessionData.session?.user
+      
       if (user) {
-        supabase
+        const { data: studentData } = await supabase
           .from('students')
           .select('student_id')
           .eq('auth_user_id', user.id)
           .single()
-          .then(({ data }) => setStudentId(data?.student_id || null))
+          
+        setStudentId(studentData?.student_id || null)
       }
-    })
+    }
+
+    fetchStudentId()
   }, [])
 
-  // 2) Подтягиваем уникальные категории из БД
+  // Загружаем уникальные категории из БД
   useEffect(() => {
-    supabase
-      .from('ideas')
-      .select('category', { distinct: true })
-      .then(({ data }) => {
-        const cats = data.map(r => r.category).filter(Boolean)
-        setDbCategories(cats)
-      })
+    const fetchCategories = async () => {
+      const { data } = await supabase
+        .from('ideas')
+        .select('category', { distinct: true })
+        
+      const cats = data.map(r => r.category).filter(Boolean)
+      setDbCategories(cats)
+    }
+
+    fetchCategories()
   }, [])
 
-  // Объединяем статические и из БД, убираем дубли и сортируем
+  // Объединяем и сортируем категории
   const categories = Array.from(
     new Set([...STATIC_CATEGORIES, ...dbCategories])
-  )
+  ).sort()
 
   const handleSubmit = async e => {
     e.preventDefault()
     if (!category || !content.trim()) return
 
     setLoading(true)
-    const { error } = await supabase
-      .from('ideas')
-      .insert({ student_id: studentId, category, content })
-    setLoading(false)
+    setError('')
+    
+    try {
+      const { error: submitError } = await supabase
+        .from('ideas')
+        .insert({ 
+          student_id: studentId, 
+          category, 
+          content 
+        })
 
-    if (error) {
-      setError(error.message)
-    } else {
+      if (submitError) throw submitError
+      
       setContent('')
       setCategory('')
-      onSuccess()
+      onSuccess?.()
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setLoading(false)
     }
   }
 
-  // Если не залогинен — предлагаем войти
+  // Если пользователь не авторизован
   if (studentId === null) {
     return (
-      <div style={{
-        padding: '16px',
-        border: '1px solid #ddd',
-        borderRadius: 4,
-        marginBottom: 24,
-        background: '#f9f9f9'
-      }}>
-        <p>
-          Чтобы предложить идею, пожалуйста,{' '}
-          <Link href="/Personal">
-             
+      <div className={styles.outerContainer}>
+        <div className={styles.authMessageContainer}>
+          <p className={styles.authMessage}>
+            Чтобы предложить идею, пожалуйста,{' '}
+            <Link href="/Personal" className={styles.link}>
               войдите или зарегистрируйтесь
-            
-          </Link>.
-        </p>
+            </Link>.
+          </p>
+        </div>
       </div>
     )
   }
 
   return (
-    <form onSubmit={handleSubmit} style={{ marginBottom: 32 }}>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+    <div className={styles.outerContainer}>
+      <form onSubmit={handleSubmit} className={styles.form}>
+        {error && (
+          <div className={styles.errorContainer}>
+            <p className={styles.errorText}>{error}</p>
+          </div>
+        )}
 
-      <label htmlFor="category" style={{ display: 'block', marginBottom: 8 }}>
-        Категория:
-      </label>
-      <select
-        id="category"
-        name="category"
-        value={category}
-        onChange={e => setCategory(e.target.value)}
-        required
-        style={{
-          width: '100%',
-          padding: 8,
-          marginBottom: 16,
-          borderRadius: 4,
-          border: '1px solid #ccc'
-        }}
-      >
-        <option value="">— выберите —</option>
-        {categories.map(c => (
-          <option key={c} value={c}>{c}</option>
-        ))}
-      </select>
+        <div className={styles.inputGroup}>
+          <label htmlFor="category" className={styles.label}>
+            Категория:
+          </label>
+          <div className={styles.selectContainer}>
+            <select
+              id="category"
+              value={category}
+              onChange={e => setCategory(e.target.value)}
+              required
+              className={styles.select}
+              disabled={loading}
+            >
+              <option value="">— выберите категорию —</option>
+              {categories.map(c => (
+                <option key={c} value={c}>{c}</option>
+              ))}
+            </select>
+            <div className={styles.selectArrow}>▼</div>
+          </div>
+        </div>
 
-      <label htmlFor="content" style={{ display: 'block', marginBottom: 8 }}>
-        Текст идеи:
-      </label>
-      <textarea
-        id="content"
-        name="content"
-        rows={4}
-        placeholder="Опишите вашу идею…"
-        value={content}
-        onChange={e => setContent(e.target.value)}
-        required
-        style={{
-          width: '100%',
-          padding: 8,
-          marginBottom: 16,
-          borderRadius: 4,
-          border: '1px solid #ccc'
-        }}
-      />
+        <div className={styles.inputGroup}>
+          <label htmlFor="content" className={styles.label}>
+            Текст идеи:
+          </label>
+          <textarea
+            id="content"
+            value={content}
+            onChange={e => setContent(e.target.value)}
+            placeholder="Опишите вашу идею максимально подробно..."
+            required
+            className={styles.textarea}
+            disabled={loading}
+            rows={6}
+          />
+        </div>
 
-      <button
-        type="submit"
-        disabled={loading}
-        style={{
-          padding: '10px 20px',
-          background: '#28a745',
-          color: '#fff',
-          border: 'none',
-          borderRadius: 4,
-          cursor: 'pointer'
-        }}
-      >
-        {loading ? 'Сохраняем…' : 'Предложить идею'}
-      </button>
-    </form>
+        <div className={styles.buttonContainer}>
+          <button
+            type="submit"
+            disabled={loading}
+            className={styles.submitButton}
+          >
+            {loading ? (
+              <span className={styles.buttonText}>Отправка...</span>
+            ) : (
+              <span className={styles.buttonText}>Опубликовать идею</span>
+            )}
+          </button>
+        </div>
+      </form>
+    </div>
   )
 }

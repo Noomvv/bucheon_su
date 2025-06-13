@@ -1,0 +1,182 @@
+.container {
+    width: 95%;
+    margin: 0 auto;
+    padding: 20px 0;
+}
+
+.card {
+    border: 1px solid var(--block-color);
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    background-color: var(--bg-color);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.searchInput {
+    flex: 1;
+    padding: 12px 16px;
+    border-radius: 12px;
+    border: 1px solid var(--block-color);
+    font-size: 1em;
+    outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    min-width: 200px; /* Минимальная ширина для предотвращения сжатия */
+}
+
+.searchInput:focus {
+    border-color: var(--main-color);
+    box-shadow: 0 0 0 2px rgba(240, 151, 61, 0.2);
+}
+
+.select {
+    padding: 12px 16px;
+    border-radius: 12px;
+    border: 1px solid var(--block-color);
+    font-size: 1em;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    outline: none;
+    transition: border-color 0.3s;
+    min-width: 200px; /* Минимальная ширина для предотвращения сжатия */
+}
+
+.select:focus {
+    border-color: var(--main-color);
+}
+
+.filterContainer {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+    flex-wrap: wrap; /* Позволяет перенос элементов на новую строку */
+}
+
+.metaText {
+    font-size: 0.9em;
+    color: var(--text-color);
+    margin: 12px 0;
+    line-height: 1.5;
+}
+
+.voteButtons {
+    display: flex;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.pagination {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 32px;
+}
+
+.paginationButton {
+    padding: 10px 20px;
+    border-radius: 12px;
+    border: none;
+    background-color: var(--main-color);
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-size: 1em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.paginationButton:hover {
+    background-color: var(--accent-color);
+    transform: translateY(-1px);
+}
+
+.paginationButton:disabled {
+    background-color: var(--block-color);
+    cursor: not-allowed;
+    transform: none;
+}
+
+.loading {
+    color: var(--text-color);
+    text-align: center;
+    padding: 40px 0;
+    font-size: 1.1em;
+}
+
+.emptyState {
+    text-align: center;
+    color: var(--text-color);
+    padding: 60px 20px;
+    font-size: 1.1em;
+    border-radius: 12px;
+    background-color: rgba(213, 213, 213, 0.2);
+}
+
+/* Стили для кнопок голосования */
+.voteButton {
+    display: flex;
+    align-items: center;
+    gap: 6px; /* Уменьшаем расстояние между иконкой и текстом */
+    padding: 8px 14px; /* Уменьшаем внутренние отступы */
+    border-radius: 8px; /* Уменьшаем скругление углов */
+    border: 1px solid var(--block-color);
+    background-color: var(--bg-color);
+    cursor: pointer;
+    transition: all 0.3s;
+    font-size: 0.9em; /* Уменьшаем размер текста */
+}
+
+.voteButton:hover {
+    transform: translateY(-1px); /* Уменьшаем эффект при наведении */
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.icon {
+    width: 16px; /* Уменьшаем ширину иконки */
+    height: 16px; /* Уменьшаем высоту иконки */
+    transition: transform 0.2s;
+}
+
+.voteCount {
+    font-weight: bold;
+    min-width: 20px; /* Уменьшаем минимальную ширину */
+    text-align: center;
+    font-size: 0.9em; /* Уменьшаем размер текста */
+}
+
+.likeButton {
+    color: #2E7D32;
+}
+
+.likeButton.active {
+    background-color: rgba(46, 125, 50, 0.1);
+    border-color: #2E7D32;
+}
+
+.dislikeButton {
+    color: #C62828;
+}
+
+.dislikeButton.active {
+    background-color: rgba(198, 40, 40, 0.1);
+    border-color: #C62828;
+}
+
+/* Адаптивность для мобильных экранов */
+@media (max-width: 640px) {
+    .filterContainer {
+        flex-direction: column; /* Располагаем элементы вертикально */
+        gap: 16px; /* Увеличиваем расстояние между элементами */
+    }
+
+    .searchInput,
+    .select {
+        width: 100%; /* Элементы занимают всю ширину */
+    }
+}
