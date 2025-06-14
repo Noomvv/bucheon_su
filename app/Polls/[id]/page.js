@@ -147,8 +147,9 @@ export default function PollDetailPage() {
         </button>
       </div>
 
-      <PollCommentList comments={comments} />
+      {/* Переместили форму комментариев выше */}
       <PollCommentForm pollId={+id} onCommented={loadAll} />
+      <PollCommentList comments={comments} />
     </div>
   )
 }

@@ -22,7 +22,7 @@ export default function StudentCouncil() {
             <span className={styles.logoText}>BUT Eagles</span>
           </div>
           <p className={styles.logoDescription}>
-            Нынешняя команда студенческого совета, представляющая интересы студентов и организующая ключевые события университета.
+            Нынешняя команда студенческого совета.
           </p>
         </section>
 

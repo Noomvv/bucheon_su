@@ -11,13 +11,13 @@ export default function PollCommentList({ comments }) {
           <strong>
             {c.firstname || '—'} {c.lastname || ''}
           </strong>
-          {' '}({c.faculty || '—'})
+          {/* {' '}({c.faculty || '—'}) */}
           <div style={{ marginTop: 4 }}>
             {c.comment}
           </div>
-          <small style={{ color: '#666' }}>
+          {/* <small style={{ color: '#666' }}>
             {new Date(c.created_at).toLocaleString()}
-          </small>
+          </small> */}
         </div>
       ))}
     </div>
