@@ -1,33 +1,26 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { supabase } from '../../../lib/supabaseClient'
-import PollCommentList from '../../components/PollCommentList'
-import PollCommentForm from '../../components/PollCommentForm'
+import { useParams }           from 'next/navigation'
+import { supabase }            from '../../../lib/supabaseClient'
+import PollCommentList         from '../../components/PollCommentList'
+import PollCommentForm         from '../../components/PollCommentForm'
 
-export default function PollDetailPage({ params }) {
-  const [poll, setPoll] = useState(null)
-  const [stats, setStats] = useState({ yes: 0, maybe: 0, no: 0 })
-  const [reaction, setReaction] = useState(0)
-  const [comments, setComments] = useState([])
-  const [id, setId] = useState(null)
+export default function PollDetailPage() {
+  // <-- useParams instead of destructuring params prop
+  const { id } = useParams()
 
-  useEffect(() => {
-    async function unwrapParams() {
-      const { id } = await params // Разворачиваем params
-      setId(id)
-    }
-    unwrapParams()
-  }, [params])
+  const [poll, setPoll]           = useState(null)
+  const [stats, setStats]         = useState({ yes:0, maybe:0, no:0 })
+  const [reaction, setReaction]   = useState(0)
+  const [comments, setComments]   = useState([])
 
   useEffect(() => {
-    if (id) {
-      loadAll()
-    }
+    loadAll()
   }, [id])
 
   async function loadAll() {
-    // Получаем сам опрос
+    // 1) Load poll
     const { data: p } = await supabase
       .from('polls')
       .select('question, created_at')
@@ -35,19 +28,19 @@ export default function PollDetailPage({ params }) {
       .single()
     setPoll(p)
 
-    // Итоги реакций
+    // 2) Load reactions & stats
     const { data: votes = [] } = await supabase
       .from('poll_reactions')
       .select('vote, user_id')
       .eq('poll_id', +id)
 
     setStats({
-      yes: votes.filter(v => v.vote === 1).length,
+      yes:   votes.filter(v => v.vote === 1).length,
       maybe: votes.filter(v => v.vote === 0).length,
-      no: votes.filter(v => v.vote === -1).length,
+      no:    votes.filter(v => v.vote === -1).length,
     })
 
-    // Моя реакция
+    // 3) Load my reaction
     const { data: sess } = await supabase.auth.getSession()
     if (sess.session) {
       const { data: me } = await supabase
@@ -59,21 +52,41 @@ export default function PollDetailPage({ params }) {
       setReaction(me?.vote || 0)
     }
 
-    // Комментарии
+    // 4) Load comments (id, comment, created_at, user_id)
     const { data: comms = [] } = await supabase
       .from('poll_comments')
-      .select('id, comment, created_at, students(firstname, lastname)')
+      .select('id, comment, created_at, user_id')
       .eq('poll_id', +id)
       .order('created_at', { ascending: true })
-    setComments(comms)
+
+    // 5) Batch-fetch student info
+    const uids = Array.from(new Set(comms.map(c => c.user_id)))
+    let students = []
+    if (uids.length) {
+      const { data: st } = await supabase
+        .from('students')
+        .select('auth_user_id, firstname, lastname, faculty')
+        .in('auth_user_id', uids)
+      students = st || []
+    }
+
+    // 6) Merge
+    const merged = comms.map(c => {
+      const s = students.find(s => s.auth_user_id === c.user_id) || {}
+      return {
+        ...c,
+        firstname: s.firstname,
+        lastname:  s.lastname,
+        faculty:   s.faculty,
+      }
+    })
+
+    setComments(merged)
   }
 
   async function handleReact(v) {
     const { data: sess } = await supabase.auth.getSession()
-    if (!sess.session) {
-      alert('Пожалуйста, войдите.')
-      return
-    }
+    if (!sess.session) return alert('Пожалуйста, войдите.')
     const uid = sess.session.user.id
 
     const { data: existing } = await supabase
