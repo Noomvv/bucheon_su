@@ -1,3 +1,12 @@
+.calendar {
+  width: 95%; /* Занимает 95% ширины */
+  margin: 0 auto; /* Центрируем по горизонтали */
+  border-radius: 12px; /* Закругленные углы */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Тень */
+  overflow: hidden; /* Обрезаем содержимое, выходящее за границы */
+  margin-bottom: 20px;
+}
+
 .promoWrapper {
   position: relative; /* Родитель для абсолютного позиционирования изображения */
   width: 95%;

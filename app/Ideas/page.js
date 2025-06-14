@@ -21,7 +21,7 @@ export default function IdeasPage() {
             alt="Человек думает"
             className={styles.promoImageOverlap}/>
             <div className={styles.promoBlock}>
-                <div className={styles.promoText}>Есть предложение, как сделать универ лучше? Заполняй форму — мы всё читаем.</div>
+                <div className={styles.promoText}>У тебя есть идея? Делись! Если она наберёт 100 лайков, её рассмотрит администрация.</div>
             </div>
         </div>
 
