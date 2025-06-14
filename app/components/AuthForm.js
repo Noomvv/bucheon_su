@@ -129,7 +129,7 @@ export default function AuthForm() {
         )}
 
         <label className={styles.label}>
-          Email:
+          Ваш email:
           <input
             type="text"
             value={login}

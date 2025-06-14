@@ -15,18 +15,26 @@ export default function StudentCouncil() {
   return (
     <div className={styles.wrapper}>
       <div className={styles.container}>
-        <header className={styles.header}>
+        {/* Новый блок с логотипом и названием */}
+        <section className={styles.logoSection}>
           <div className={styles.logoContainer}>
-            {/* <AcademicCapIcon className={styles.logoIcon} /> */}
-            <img src='/images/default.webp' className={styles.logoIcon}/>
+            <img src='/images/default.webp' className={styles.logoIcon} alt="Logo" />
             <span className={styles.logoText}>BUT Eagles</span>
           </div>
+          <p className={styles.logoDescription}>
+            Нынешняя команда студенческого совета, представляющая интересы студентов и организующая ключевые события университета.
+          </p>
+        </section>
+
+        <header className={styles.header}>
           <div className={styles.chairmanContainer}>
             <div className={styles.chairmanPhoto}>
-              {/* <UserIcon className={styles.photoIcon} /> */}
-              <img src='/member-img/kim_andrey.webp' className={styles.photoIcon} alt="Chairman Photo"/>
+              <img src='/member-img/kim_andrey.webp' className={styles.photoIcon} alt="Chairman Photo" />
             </div>
-            <p className={styles.chairman}>Президент совета: <br/>Ким Андрей</p>
+            <p className={styles.chairman}>
+              Президент совета: <br />
+              Ким Андрей
+            </p>
           </div>
         </header>
 
@@ -37,8 +45,7 @@ export default function StudentCouncil() {
               Наша миссия
             </h2>
             <p>
-              Представляем интересы студентов, организуем мероприятия и воплощаем идеи 
-              в жизнь. Ваш голос, ваша активность, ваша платформа для изменений.
+              Представляем интересы студентов, организуем мероприятия и воплощаем идеи в жизнь. Ваш голос, ваша активность, ваша платформа для изменений.
             </p>
           </div>
 
@@ -56,10 +63,6 @@ export default function StudentCouncil() {
                 <LightBulbIcon className={styles.listIcon} />
                 <span>Платформа для студенческих инициатив</span>
               </li>
-              {/* <li>
-                <ChatBubbleLeftRightIcon className={styles.listIcon} />
-                <span>Канал обратной связи с администрацией</span>
-              </li> */}
               <li>
                 <UserGroupIcon className={styles.listIcon} />
                 <span>Знакомство с составом студсовета</span>
@@ -73,8 +76,7 @@ export default function StudentCouncil() {
               Стань частью команды!
             </h2>
             <p>
-              Твои идеи могут изменить университет к лучшему. 
-              Студенческий совет - это площадка для твоей реализации.
+              Твои идеи могут изменить университет к лучшему. Студенческий совет - это площадка для твоей реализации.
             </p>
           </div>
         </div>

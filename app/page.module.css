@@ -27,26 +27,39 @@
   box-shadow: 0 2px 10px rgba(0,0,0,0.05);
 }
 
+.logoSection {
+  /* margin-bottom: 20px; */
+  padding: 20px;
+  background-color: var(--bg-color);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
 .logoContainer {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 12px;
 }
 
 .logoIcon {
-  width: 40px;
-  height: 40px;
-  color: #F0973D;
-  background-color: #FEF6EE;
-  /* padding: 8px; */
-  border-radius: 12px;
-  
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  object-fit: cover;
 }
 
 .logoText {
-  font-size: 1.2rem;
-  font-weight: 600;
-  color: #333;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--main-color);
+}
+
+.logoDescription {
+  margin-top: 10px;
+  font-size: 1rem;
+  color: var(--text-color);
 }
 
 .chairmanContainer {

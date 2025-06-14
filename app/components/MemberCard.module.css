@@ -1,6 +1,6 @@
 .card {
-  width: calc(100% - 32px);
-  margin: 0 auto 12px;
+  width: 100%; /* Карточка занимает 100% ширины */
+  margin: 0 auto 12px; /* Центрируем карточку и добавляем отступ снизу */
   background: var(--bg-color);
   border-radius: 12px;
   box-shadow: 
