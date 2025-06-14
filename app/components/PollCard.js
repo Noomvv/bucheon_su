@@ -1,12 +1,14 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { supabase }             from '../../lib/supabaseClient'
-import Link                     from 'next/link'
+import { supabase } from '../../lib/supabaseClient'
+import Link from 'next/link'
+import { ChatBubbleLeftIcon, HandThumbUpIcon, HandThumbDownIcon, FaceSmileIcon } from '@heroicons/react/24/outline'
+import styles from './PollCard.module.css'
 
 export default function PollCard({ poll }) {
-  const [stats, setStats]       = useState({ yes: 0, maybe: 0, no: 0 })
-  const [myVote, setMyVote]     = useState(0)
+  const [stats, setStats] = useState({ yes: 0, maybe: 0, no: 0 })
+  const [myVote, setMyVote] = useState(0)
   const [loadingVote, setLoadingVote] = useState(false)
 
   useEffect(() => {
@@ -14,20 +16,17 @@ export default function PollCard({ poll }) {
   }, [])
 
   async function loadStats() {
-    // 1) Load all votes for this poll
     const { data: votes = [] } = await supabase
       .from('poll_reactions')
       .select('vote, user_id')
       .eq('poll_id', poll.id)
 
-    // 2) Tally
     setStats({
-      yes:   votes.filter(v => v.vote === 1).length,
+      yes: votes.filter(v => v.vote === 1).length,
       maybe: votes.filter(v => v.vote === 0).length,
-      no:    votes.filter(v => v.vote === -1).length,
+      no: votes.filter(v => v.vote === -1).length,
     })
 
-    // 3) Load your vote
     const { data: sess } = await supabase.auth.getSession()
     if (!sess.session) return
 
@@ -51,7 +50,6 @@ export default function PollCard({ poll }) {
     }
     const uid = sess.session.user.id
 
-    // check existing
     const { data: existing } = await supabase
       .from('poll_reactions')
       .select('vote')
@@ -61,14 +59,12 @@ export default function PollCard({ poll }) {
 
     if (existing) {
       if (existing.vote === value) {
-        // remove vote
         await supabase
           .from('poll_reactions')
           .delete()
           .eq('poll_id', poll.id)
           .eq('user_id', uid)
       } else {
-        // change vote
         await supabase
           .from('poll_reactions')
           .update({ vote: value })
@@ -76,7 +72,6 @@ export default function PollCard({ poll }) {
           .eq('user_id', uid)
       }
     } else {
-      // insert new
       await supabase
         .from('poll_reactions')
         .insert({ poll_id: poll.id, user_id: uid, vote: value })
@@ -87,41 +82,42 @@ export default function PollCard({ poll }) {
   }
 
   return (
-    <div style={{
-      border: '1px solid #ddd',
-      borderRadius: 4,
-      padding: 12,
-      marginBottom: 12
-    }}>
-      <h3>{poll.question}</h3>
+    <div className={styles.card}>
+      <h3 className={styles.question}>{poll.question}</h3>
 
-      <div style={{ display: 'flex', gap: 12, margin: '8px 0' }}>
-        <button
-          disabled={loadingVote}
-          style={{ color: myVote === 1 ? 'green' : undefined }}
-          onClick={() => handleReact(1)}
-        >
-          👍 {stats.yes}
-        </button>
-        <button
-          disabled={loadingVote}
-          style={{ color: myVote === 0 ? 'orange' : undefined }}
-          onClick={() => handleReact(0)}
-        >
-          🤔 {stats.maybe}
-        </button>
-        <button
-          disabled={loadingVote}
-          style={{ color: myVote === -1 ? 'red' : undefined }}
-          onClick={() => handleReact(-1)}
-        >
-          👎 {stats.no}
-        </button>
+      <div className={styles.actions}>
+        <div className={styles.reactions}>
+          <button
+            disabled={loadingVote}
+            className={`${styles.reaction} ${myVote === 1 ? styles.activeYes : ''}`}
+            onClick={() => handleReact(1)}
+          >
+            <HandThumbUpIcon className={styles.icon} />
+            <span>{stats.yes}</span>
+          </button>
+          <button
+            disabled={loadingVote}
+            className={`${styles.reaction} ${myVote === 0 ? styles.activeMaybe : ''}`}
+            onClick={() => handleReact(0)}
+          >
+            <FaceSmileIcon className={styles.icon} />
+            <span>{stats.maybe}</span>
+          </button>
+          <button
+            disabled={loadingVote}
+            className={`${styles.reaction} ${myVote === -1 ? styles.activeNo : ''}`}
+            onClick={() => handleReact(-1)}
+          >
+            <HandThumbDownIcon className={styles.icon} />
+            <span>{stats.no}</span>
+          </button>
+        </div>
+
+        <Link href={`/Polls/${poll.id}`} className={styles.commentsLink}>
+          <ChatBubbleLeftIcon className={styles.icon} />
+          <span>Комментарии</span>
+        </Link>
       </div>
-
-      <Link href={`/Polls/${poll.id}`}>
-        <button style={{ marginTop: 8 }}>Комментарии »</button>
-      </Link>
     </div>
   )
 }

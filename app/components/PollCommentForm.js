@@ -1,12 +1,14 @@
 // app/components/PollCommentForm.js
 'use client'
 
-import { useState }  from 'react'
-import { supabase }  from '../../lib/supabaseClient'
+import { useState } from 'react'
+import { supabase } from '../../lib/supabaseClient'
+import { PaperAirplaneIcon } from '@heroicons/react/24/outline'
+import styles from './PollCommentForm.module.css'
 
 export default function PollCommentForm({ pollId, onCommented }) {
-  const [text, setText]       = useState('')
-  const [submitting, setSub]  = useState(false)
+  const [text, setText] = useState('')
+  const [submitting, setSub] = useState(false)
 
   const submit = async e => {
     e.preventDefault()
@@ -29,17 +31,27 @@ export default function PollCommentForm({ pollId, onCommented }) {
   }
 
   return (
-    <form onSubmit={submit} style={{ marginTop: 8 }}>
-      <input
-        type="text"
-        value={text}
-        onChange={e => setText(e.target.value)}
-        placeholder="Ваш комментарий…"
-        style={{ width: '80%', marginRight: 8 }}
-      />
-      <button type="submit" disabled={submitting || !text.trim()}>
-        {submitting ? '…' : 'Комментировать'}
-      </button>
+    <form onSubmit={submit} className={styles.form}>
+      <div className={styles.inputContainer}>
+        <input
+          type="text"
+          value={text}
+          onChange={e => setText(e.target.value)}
+          placeholder="Написать комментарий..."
+          className={styles.input}
+        />
+        <button 
+          type="submit" 
+          disabled={submitting || !text.trim()}
+          className={styles.submitButton}
+        >
+          {submitting ? (
+            '...'
+          ) : (
+            <PaperAirplaneIcon className={styles.icon} />
+          )}
+        </button>
+      </div>
     </form>
   )
 }

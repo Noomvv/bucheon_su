@@ -1,0 +1,46 @@
+/* app/components/PollCommentList.module.css */
+.commentsContainer {
+  width: 100%; /* Контейнер занимает всю ширину */
+  margin-top: 16px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.comment {
+  width: 100%; /* Комментарий занимает всю ширину */
+  padding: 16px;
+  border-bottom: 1px solid #f5f5f5;
+}
+
+.comment:last-child {
+  border-bottom: none;
+}
+
+.commentHeader {
+  width: 100%; /* Заголовок комментария занимает всю ширину */
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.userName {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+}
+
+.commentText {
+  width: 100%; /* Текст комментария занимает всю ширину */
+  font-size: 14px;
+  line-height: 1.5;
+  color: #333;
+  margin-bottom: 4px;
+}
+
+.timestamp {
+  font-size: 12px;
+  color: #999;
+}

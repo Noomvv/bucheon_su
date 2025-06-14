@@ -2,14 +2,25 @@
 'use client'
 
 import AddPollButton from '../components/AddPollButton'
-import PollList      from '../components/PollList'
+import PollList from '../components/PollList'
+import styles from './page.module.css'
 
 export default function PollsPage() {
   return (
-    <div style={{ maxWidth: 600, margin: '0 auto', padding: 20 }}>
-      <h1>Опросы</h1>
-      <AddPollButton />
-      <PollList />
+    <div className={styles.container}>
+      <div className={styles.content}>
+        <PollList />
+        <div className={styles.promoWrapper}>
+            <img
+            src="/images/promo4.png" // Указан правильный путь к изображению
+            alt="Человек думает"
+            className={styles.promoImageOverlap}/>
+            <div className={styles.promoBlock}>
+                <div className={styles.promoText}>Опросы от студсовета — голосуй с реакциями и делись мнением в комментариях.</div>
+            </div>
+        </div>
+        <AddPollButton />
+      </div>
     </div>
   )
 }

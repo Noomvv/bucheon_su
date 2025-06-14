@@ -1,23 +1,31 @@
 'use client'
 
+import styles from './PollCommentList.module.css'
+
 export default function PollCommentList({ comments }) {
   return (
-    <div style={{ marginTop: 16 }}>
+    <div className={styles.commentsContainer}>
       {comments.map(c => (
-        <div key={c.id} style={{
-          padding: '8px 0',
-          borderBottom: '1px solid #eee'
-        }}>
-          <strong>
-            {c.firstname || '—'} {c.lastname || ''}
-          </strong>
-          {/* {' '}({c.faculty || '—'}) */}
-          <div style={{ marginTop: 4 }}>
+        <div key={c.id} className={styles.comment}>
+          <div className={styles.commentHeader}>
+            <strong className={styles.userName}>
+              {c.firstname || '—'} {c.lastname || ''}
+            </strong>
+            
+            {/* {c.faculty && (
+              <span className={styles.faculty}>
+                ({c.faculty})
+              </span>
+            )} */}
+          </div>
+
+          <div className={styles.commentText}>
             {c.comment}
           </div>
-          {/* <small style={{ color: '#666' }}>
+
+          {/* <div className={styles.timestamp}>
             {new Date(c.created_at).toLocaleString()}
-          </small> */}
+          </div> */}
         </div>
       ))}
     </div>
