@@ -1,7 +1,6 @@
 /* AuthForm.module.css */
 .container {
     width: 100%; /* Контейнер занимает всю ширину экрана */
-    height: 100vh; /* Контейнер занимает всю высоту экрана */
     margin: 0; /* Убираем внешние отступы */
     padding: 0; /* Убираем внутренние отступы */
     display: flex; /* Используем flexbox для выравнивания содержимого */
@@ -59,8 +58,8 @@
 .input {
     width: 100%; /* Поля ввода занимают всю ширину формы */
     padding: 14px 16px;
-    border: 1px solid var(--border-color); /* Добавляем границу */
-    border-radius: 10px;
+    border: none; /* Добавляем границу */
+    border-radius: 12px;
     font-size: 16px;
     background-color: var(--bg-color);
     color: var(--text-color);
