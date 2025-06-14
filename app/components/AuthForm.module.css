@@ -1,8 +1,14 @@
 /* AuthForm.module.css */
 .container {
-    max-width: 360px;
-    margin: 40px auto;
-    padding: 20px;
+    width: 100%; /* Контейнер занимает всю ширину экрана */
+    height: 100vh; /* Контейнер занимает всю высоту экрана */
+    margin: 0; /* Убираем внешние отступы */
+    padding: 0; /* Убираем внутренние отступы */
+    display: flex; /* Используем flexbox для выравнивания содержимого */
+    flex-direction: column; /* Располагаем элементы вертикально */
+    justify-content: flex-start; /* Контент выравнивается по верхнему краю */
+    align-items: center; /* Центрируем содержимое по горизонтали */
+    box-sizing: border-box; /* Учитываем padding в ширине контейнера */
     opacity: 0;
     transform: translateY(20px);
     animation: fadeInUp 0.6s ease-out 0.4s forwards;
@@ -16,7 +22,10 @@
 }
 
 .title {
+    width: 100%; /* Заголовок занимает всю ширину контейнера */
     text-align: center;
+    margin: 0; /* Убираем внешние отступы */
+    padding: 0; /* Убираем внутренние отступы */
     color: var(--text-color);
     margin-bottom: 24px;
     font-weight: 500;
@@ -26,8 +35,13 @@
 }
 
 .form {
-    display: grid;
-    gap: 20px;
+    width: 100%; /* Форма занимает всю ширину контейнера */
+    max-width: 400px; /* Ограничиваем максимальную ширину формы */
+    display: grid; /* Используем grid для выравнивания элементов */
+    gap: 20px; /* Расстояние между элементами */
+    margin: 0; /* Убираем внешние отступы */
+    padding: 0; /* Убираем внутренние отступы */
+    box-sizing: border-box; /* Учитываем padding в ширине формы */
     opacity: 0;
     animation: fadeIn 0.5s ease-out 0.8s forwards;
 }
@@ -43,9 +57,9 @@
 }
 
 .input {
-    width: 100%;
+    width: 100%; /* Поля ввода занимают всю ширину формы */
     padding: 14px 16px;
-    border: none;
+    border: 1px solid var(--border-color); /* Добавляем границу */
     border-radius: 10px;
     font-size: 16px;
     background-color: var(--bg-color);
@@ -59,6 +73,7 @@
 
 .input:focus {
     outline: none;
+    border-color: var(--main-color); /* Меняем цвет границы при фокусе */
     box-shadow: 0 4px 12px rgba(240, 151, 61, 0.2);
 }
 
@@ -72,6 +87,7 @@
 }
 
 .submitButton {
+    width: 100%; /* Кнопка отправки занимает всю ширину формы */
     padding: 16px;
     background-color: var(--main-color);
     color: white;
@@ -90,7 +106,6 @@
 .submitButton:hover {
     background-color: var(--accent-color);
     box-shadow: 0 6px 14px rgba(240, 151, 61, 0.35);
-    transform: translateY(-2px);
 }
 
 .submitButton:active {
@@ -175,4 +190,64 @@
         opacity: 1;
         transform: translateY(0);
     }
+}
+
+/*  */
+.promoWrapper {
+  position: relative; /* Родитель для абсолютного позиционирования изображения */
+  width: 100%;
+    margin: 0 auto;
+    padding: 0;
+    margin-bottom: 1.5rem;
+    margin-top: 20px;
+}
+
+.promoBlock {
+  background-color: rgba(255, 156, 49, 0.269); /* Основной цвет блока */
+  color: white;
+  border-radius: 12px; /* Закругленные углы */
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.05); /* Тень */
+  overflow: hidden; /* Обрезаем содержимое по границе блока */
+  width: 100%; /* Блок занимает всю ширину wrapper */
+  display: flex;
+  align-items: center; /* Выравниваем текст по вертикали */
+  padding: 15px 10px 15px 100px; /* Отступы внутри блока */
+}
+
+.promoText {
+  margin: 0;
+    color: var(--text-color);
+    font-size: 0.9rem;
+    line-height: 1.3;
+    color: var(--text-color);
+}
+
+.promoImageOverlap {
+  position: absolute; /* Позиционируем абсолютно относительно .promo-wrapper */
+    bottom: 0; /* Привязываем нижний край изображения к нижнему краю .promo-wrapper */
+    left: 10px; /* Отступ от левого края .promo-wrapper */
+    max-width: 80px; /* Ширина изображения */
+    height: auto; /* Автоматическая высота для сохранения пропорций */
+    z-index: 1; /* Убедимся, что изображение поверх .promo-block */
+}
+
+/* Адаптация для маленьких экранов */
+@media (max-width: 300px) {
+  .promoWrapper {
+    margin: 20px 10px; /* Уменьшаем горизонтальные отступы */
+    max-width: none; /* Убираем ограничение ширины */
+  }
+
+  .promoBlock {
+    padding: 10px 10px 10px 80px; /* Уменьшаем отступы для текста */
+  }
+
+  .promoImageOverlap {
+    top: -20px; /* Уменьшаем выход изображения за верхнюю часть блока */
+    max-width: 60px; /* Уменьшаем размер изображения */
+  }
+
+  .promoText {
+    font-size: 1rem; /* Уменьшаем размер текста */
+  }
 }

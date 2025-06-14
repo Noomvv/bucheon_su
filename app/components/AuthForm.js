@@ -183,6 +183,16 @@ export default function AuthForm() {
           {mode === 'login' ? 'Регистрация' : 'Вход'}
         </button>
       </p>
+
+        <div className={styles.promoWrapper}>
+            <img
+            src="/images/promo2.png" // Указан правильный путь к изображению
+            alt="Человек думает"
+            className={styles.promoImageOverlap}/>
+            <div className={styles.promoBlock}>
+                <div className={styles.promoText}>Все пароли шифруются: Supabase использует bcrypt-хеширование.</div>
+            </div>
+        </div>
     </div>
   )
 }
