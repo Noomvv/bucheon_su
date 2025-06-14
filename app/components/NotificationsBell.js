@@ -1,28 +1,33 @@
 'use client'
 import { useState } from 'react'
+import { BellAlertIcon } from '@heroicons/react/24/outline'
+import styles from './NotificationsBell.module.css'
 
 export default function NotificationsBell({ notifications }) {
   const [open, setOpen] = useState(false)
 
   return (
-    <div className="notificationsWrapper">
+    <div className={styles.notificationsWrapper}>
       <button
-        className="bellButton"
+        className={styles.bellButton}
         onClick={() => setOpen(o => !o)}
         aria-label="Уведомления"
       >
-        🔔{notifications.length > 0 && ` (${notifications.length})`}
+        <BellAlertIcon className={styles.bellIcon} />
+        {notifications.length > 0 && (
+          <span className={styles.badge}>{notifications.length}</span>
+        )}
       </button>
       {open && (
-        <div className="notificationsList">
+        <div className={styles.notificationsList}>
           {notifications.length > 0 ? (
             notifications.map((n, i) => (
-              <div key={i} className="notification">
+              <div key={i} className={styles.notification}>
                 {n}
               </div>
             ))
           ) : (
-            <div className="notification empty">
+            <div className={`${styles.notification} ${styles.empty}`}>
               У вас нет новых уведомлений.
             </div>
           )}

@@ -1,19 +1,21 @@
 'use client'
 
+import styles from './StatsPanel.module.css'
+
 export default function StatsPanel({ ideasCount, totalLikes, rank }) {
   return (
-    <div className="stats">
-      <div className="statCard">
-        <div className="statValue">{ideasCount}</div>
-        <div className="statLabel">Предложено идей</div>
+    <div className={styles.stats}>
+      <div className={styles.statCard}>
+        <div className={styles.statValue}>{ideasCount}</div>
+        <div className={styles.statLabel}>Предложено идей</div>
       </div>
-      <div className="statCard">
-        <div className="statValue">{totalLikes}</div>
-        <div className="statLabel">Всего лайков</div>
+      <div className={styles.statCard}>
+        <div className={styles.statValue}>{totalLikes}</div>
+        <div className={styles.statLabel}>Всего лайков</div>
       </div>
-      <div className="statCard">
-        <div className="statValue">{rank}</div>
-        <div className="statLabel">Место в рейтинге</div>
+      <div className={styles.statCard}>
+        <div className={styles.statValue}>{rank || '—'}</div>
+        <div className={styles.statLabel}>Место в рейтинге</div>
       </div>
     </div>
   )

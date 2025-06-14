@@ -1,34 +1,32 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { supabase }            from '../../lib/supabaseClient'
-import AuthForm                from '../components/AuthForm'
-import LogoutButton            from '../components/LogoutButton'
-import StatsPanel              from '../components/StatsPanel'
-import NotificationsBell       from '../components/NotificationsBell'
-import styles                  from './page.module.css'
+import { supabase } from '../../lib/supabaseClient'
+import AuthForm from '../components/AuthForm'
+import LogoutButton from '../components/LogoutButton'
+import StatsPanel from '../components/StatsPanel'
+import NotificationsBell from '../components/NotificationsBell'
+import styles from './page.module.css'
 
 const LIKE_THRESHOLD = 100
 
 export default function PersonalPage() {
   const [sessionChecked, setSessionChecked] = useState(false)
-  const [session, setSession]               = useState(null)
-  const [student, setStudent]               = useState(null)
-  const [studentId, setStudentId]           = useState(null)
-  const [stats, setStats]                   = useState({ ideasCount: 0, totalLikes: 0, rank: null })
-  const [notifications, setNotifications]   = useState([])
+  const [session, setSession] = useState(null)
+  const [student, setStudent] = useState(null)
+  const [studentId, setStudentId] = useState(null)
+  const [stats, setStats] = useState({ ideasCount: 0, totalLikes: 0, rank: null })
+  const [notifications, setNotifications] = useState([])
 
   useEffect(() => {
     let mounted = true
 
-    // Общая функция для обработки нового состояния сессии
     const handleSession = async (session) => {
       if (!mounted) return
       setSession(session)
       setSessionChecked(true)
 
       if (!session) {
-        // сбросим данные при выходе
         setStudent(null)
         setStudentId(null)
         setStats({ ideasCount: 0, totalLikes: 0, rank: null })
@@ -36,7 +34,6 @@ export default function PersonalPage() {
         return
       }
 
-      // при входе — тянем студента
       const { data: stud } = await supabase
         .from('students')
         .select('firstname, lastname, student_id')
@@ -47,30 +44,25 @@ export default function PersonalPage() {
       setStudent({ firstname: stud.firstname, lastname: stud.lastname })
       setStudentId(stud.student_id)
 
-      // и его статистику + уведомления
       const { data: ideas } = await supabase
         .from('ideas')
         .select('student_id, content, idea_votes(vote)')
       if (!ideas) return
 
-      // подсчёт лайков по каждому student_id
       const likesMap = {}
       ideas.forEach(i => {
         const c = i.idea_votes.filter(v => v.vote === 1).length
         likesMap[i.student_id] = (likesMap[i.student_id] || 0) + c
       })
 
-      // метрики текущего студента
       const ideasCount = ideas.filter(i => i.student_id === stud.student_id).length
       const totalLikes = likesMap[stud.student_id] || 0
 
-      // рейтинг
       const sortedIds = Object.entries(likesMap)
         .sort((a, b) => b[1] - a[1])
         .map(([id]) => Number(id))
       const rank = sortedIds.indexOf(stud.student_id) + 1
 
-      // уведомления
       const notes = ideas
         .filter(i => i.student_id === stud.student_id)
         .filter(i => i.idea_votes.filter(v => v.vote === 1).length >= LIKE_THRESHOLD)
@@ -80,12 +72,10 @@ export default function PersonalPage() {
       setNotifications(notes)
     }
 
-    // 1) Разовая проверка при монтировании
     supabase.auth.getSession().then(({ data }) => {
       handleSession(data.session)
     })
 
-    // 2) Подписка на будущие изменения
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         handleSession(session)
@@ -98,42 +88,56 @@ export default function PersonalPage() {
     }
   }, [])
 
-  // 1) Ждём, пока не вызовется getSession()
-  if (!sessionChecked) return null
+  if (!sessionChecked) return <div className={styles.loadingContainer}></div>
 
-  // 2) Если нет сессии — форма
-  if (!session) return <AuthForm />
-
-  // 3) Если сессия есть, но студент ещё не загружен — показываем ничего/loader
-  if (!student) return null
-
-  // 4) Всё готово — рендерим кабинет
-  return (
-    <div className={styles.container}>
-      <div className={styles.header}>
-        <div>
-          <h2 className={styles.greeting}>Добро пожаловать</h2>
-          <h1 className={styles.userName}>
-            {student.firstname} {student.lastname}
-          </h1>
-        </div>
-        <NotificationsBell notifications={notifications} />
+  if (!session) return (
+    <div className={styles.authContainer}>
+      <div className={styles.authCard}>
+        <AuthForm />
       </div>
+    </div>
+  )
 
-      <StatsPanel
-        ideasCount={stats.ideasCount}
-        totalLikes={stats.totalLikes}
-        rank={stats.rank}
-      />
+  if (!student) return <div className={styles.loadingContainer}></div>
 
-      {stats.rank === 1 && (
-        <div className={styles.topMessage}>
-          Ваши идеи самые популярные среди студентов! 🎉
+  return (
+    <div className={styles.mainContainer}>
+      <div className={styles.contentContainer}>
+        {/* Header Block */}
+        <div className={styles.headerBlock}>
+          <div className={styles.headerContent}>
+            <h2 className={styles.greeting}>Добро пожаловать</h2>
+            <h1 className={styles.userName}>
+              {student.firstname} {student.lastname}
+            </h1>
+          </div>
+          <div className={styles.notificationsWrapper}>
+            <NotificationsBell notifications={notifications} />
+          </div>
         </div>
-      )}
 
-      <div className={styles.logoutWrapper}>
-        <LogoutButton />
+        {/* Stats Block */}
+        <div className={styles.statsBlock}>
+          <StatsPanel
+            ideasCount={stats.ideasCount}
+            totalLikes={stats.totalLikes}
+            rank={stats.rank}
+          />
+        </div>
+
+        {/* Top Message Block */}
+        {stats.rank === 1 && (
+          <div className={styles.topMessageBlock}>
+            <div className={styles.topMessageContent}>
+              Ваши идеи самые популярные среди студентов! 🎉
+            </div>
+          </div>
+        )}
+
+        {/* Logout Block */}
+        <div className={styles.logoutBlock}>
+          <LogoutButton />
+        </div>
       </div>
     </div>
   )
