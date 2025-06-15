@@ -35,12 +35,11 @@ export default function PollDetailPage() {
       <PollReactions pollId={+id} />
 
       {/* Remounts to refetch when commentVersion changes */}
-      <PollCommentList key={commentVersion} pollId={+id} />
-
       <PollCommentForm
         pollId={+id}
         onCommented={() => setCommentVersion(v => v + 1)}
       />
+      <PollCommentList key={commentVersion} pollId={+id} />
     </div>
   )
 }

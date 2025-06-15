@@ -28,9 +28,9 @@ export default function PollsPage() {
 
   return (
     <div style={{ maxWidth: 600, margin: '0 auto', padding: 20 }}>
-      <h1>Все опросы</h1>
-
-      {!isAdmin ? (
+      {/* remount to refetch when pollVersion changes */}
+        <PollList key={pollVersion} />
+        {!isAdmin ? (
         <button onClick={handleAdminAccess} style={{ marginBottom: 16 }}>
           Добавить опрос
         </button>
@@ -38,8 +38,6 @@ export default function PollsPage() {
         <PollCreationForm onCreated={handleCreated} />
       )}
 
-      {/* remount to refetch when pollVersion changes */}
-      <PollList key={pollVersion} />
     </div>
   )
 }

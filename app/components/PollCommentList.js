@@ -9,12 +9,12 @@ export default function PollCommentList({ pollId }) {
 
   useEffect(() => {
     (async () => {
-      // 1) Получаем сырые комментарии
+      // 1) Получаем сырые комментарии, сортируя по created_at DESC
       const { data: comms = [], error: commError } = await supabase
         .from('poll_comments')
         .select('id, comment, created_at, user_id')
         .eq('poll_id', pollId)
-        .order('created_at', { ascending: true })
+        .order('created_at', { ascending: false })   // <- здесь DESC
 
       if (commError) {
         console.error('Ошибка при загрузке комментариев', commError)
