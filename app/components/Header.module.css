@@ -2,7 +2,8 @@
 .header {
   position: sticky;
   top: 0; /* Размещаем header в самом верху */
-  background: #ffffff;
+  background: #ffffff39;
+  backdrop-filter: blur(5px);
   border-bottom: 1px solid #e5e7eb;
   padding: 1.2rem 0;
   z-index: 900;
