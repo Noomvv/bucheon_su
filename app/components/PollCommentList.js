@@ -53,17 +53,17 @@ export default function PollCommentList({ pollId }) {
       {comments.map(c => (
         <div key={c.id} className={styles.comment}>
           <div className={styles.commentHeader}>
-            <strong className={styles.userName}>
+            <span className={styles.userName}>
               {c.firstname || '—'} {c.lastname || ''}
-            </strong>
-            <span className={styles.faculty}>
-              {c.faculty || '—'}
             </span>
+            {/* <span className={styles.metaInfo}>
+              <span className={styles.faculty}>{c.faculty || '—'}</span>
+              <span className={styles.timestamp}>
+                {new Date(c.created_at).toLocaleString()}
+              </span>
+            </span> */}
           </div>
           <p className={styles.commentBody}>{c.comment}</p>
-          <small className={styles.timestamp}>
-            {new Date(c.created_at).toLocaleString()}
-          </small>
         </div>
       ))}
     </div>
