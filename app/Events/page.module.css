@@ -18,7 +18,7 @@
 
 .promoBlock {
   background-color: rgba(255, 156, 49, 0.269); /* Основной цвет блока */
-  color: white;
+  /* color: white; */
   border-radius: 12px; /* Закругленные углы */
   box-shadow: 0 6px 15px rgba(0, 0, 0, 0.05); /* Тень */
   overflow: hidden; /* Обрезаем содержимое по границе блока */

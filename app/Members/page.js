@@ -199,13 +199,24 @@ const students = [
 export default function Members() {
   return (
     <div className={styles.container}>
-      <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-md mx-auto space-y-6">
-          {students.map(student => (
-            <MemberCard key={student.id} student={student} />
-          ))}
+        <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+            <div className="max-w-md mx-auto space-y-6">
+            {students.map(student => (
+                <MemberCard key={student.id} student={student} />
+            ))}
+            </div>
         </div>
-      </div>
+
+
+        <div className={styles.promoWrapper}>
+                <img
+                src="/images/promo5.png" // Указан правильный путь к изображению
+                alt="Человек думает"
+                className={styles.promoImageOverlap}/>
+                <div className={styles.promoBlock}>
+                    <div className={styles.promoText}>Хотите что-то обсудить? Просто напишите нам лично — Telegram у каждого указан.</div>
+                </div>
+            </div>
     </div>
   )
 }
