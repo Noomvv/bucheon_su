@@ -1,8 +1,53 @@
 'use client'
 
-import styles from './PollCommentList.module.css'
+import { useState, useEffect } from 'react'
+import { supabase }            from '../../lib/supabaseClient'
+import styles                  from './PollCommentList.module.css'
 
-export default function PollCommentList({ comments }) {
+export default function PollCommentList({ pollId }) {
+  const [comments, setComments] = useState([])
+
+  useEffect(() => {
+    (async () => {
+      // 1) Получаем сырые комментарии
+      const { data: comms = [], error: commError } = await supabase
+        .from('poll_comments')
+        .select('id, comment, created_at, user_id')
+        .eq('poll_id', pollId)
+        .order('created_at', { ascending: true })
+
+      if (commError) {
+        console.error('Ошибка при загрузке комментариев', commError)
+        return
+      }
+
+      // 2) Узнаём уникальные user_id и подтягиваем студентов
+      const uids = [...new Set(comms.map(c => c.user_id))]
+      let students = []
+      if (uids.length) {
+        const { data: st = [], error: stuError } = await supabase
+          .from('students')
+          .select('auth_user_id, firstname, lastname, faculty')
+          .in('auth_user_id', uids)
+        if (stuError) console.error('Ошибка при загрузке студентов', stuError)
+        else         students = st
+      }
+
+      // 3) Мержим
+      const merged = comms.map(c => {
+        const s = students.find(s => s.auth_user_id === c.user_id) || {}
+        return {
+          ...c,
+          firstname: s.firstname,
+          lastname:  s.lastname,
+          faculty:   s.faculty,
+        }
+      })
+
+      setComments(merged)
+    })()
+  }, [pollId])
+
   return (
     <div className={styles.commentsContainer}>
       {comments.map(c => (
@@ -11,21 +56,14 @@ export default function PollCommentList({ comments }) {
             <strong className={styles.userName}>
               {c.firstname || '—'} {c.lastname || ''}
             </strong>
-            
-            {/* {c.faculty && (
-              <span className={styles.faculty}>
-                ({c.faculty})
-              </span>
-            )} */}
+            <span className={styles.faculty}>
+              {c.faculty || '—'}
+            </span>
           </div>
-
-          <div className={styles.commentText}>
-            {c.comment}
-          </div>
-
-          {/* <div className={styles.timestamp}>
+          <p className={styles.commentBody}>{c.comment}</p>
+          <small className={styles.timestamp}>
             {new Date(c.created_at).toLocaleString()}
-          </div> */}
+          </small>
         </div>
       ))}
     </div>
