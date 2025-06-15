@@ -2,6 +2,8 @@
 
 import { useState } from 'react'
 import { supabase } from '../../lib/supabaseClient'
+import { PaperAirplaneIcon } from '@heroicons/react/24/outline'
+import styles from './PollCommentForm.module.css'
 
 export default function PollCommentForm({ pollId, onCommented }) {
   const [text, setText] = useState('')
@@ -34,17 +36,24 @@ export default function PollCommentForm({ pollId, onCommented }) {
   }
 
   return (
-    <form onSubmit={handleSubmit} style={{ marginTop: 16 }}>
-      <textarea
-        value={text}
-        onChange={e => setText(e.target.value)}
-        placeholder="Ваш комментарий…"
-        rows={3}
-        style={{ width: '100%', padding: 8 }}
-      />
-      <button type="submit" style={{ marginTop: 8 }}>
-        Отправить
-      </button>
+    <form onSubmit={handleSubmit} className={styles.formContainer}>
+      <div className={styles.inputGroup}>
+        <textarea
+          value={text}
+          onChange={e => setText(e.target.value)}
+          placeholder="Ваш комментарий…"
+          rows={1}
+          className={styles.commentInput}
+        />
+        <button 
+          type="submit" 
+          className={styles.submitButton} 
+          disabled={!text.trim()}
+          aria-label="Отправить комментарий"
+        >
+          <PaperAirplaneIcon className={styles.sendIcon} />
+        </button>
+      </div>
     </form>
   )
 }

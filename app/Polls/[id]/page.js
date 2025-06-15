@@ -42,16 +42,16 @@ export default function PollDetailPage() {
           </div>
         </div>
 
-        <div className={styles.section}>
+        
           <PollCommentForm
             pollId={+id}
             onCommented={() => setCommentVersion(v => v + 1)}
           />
-        </div>
+        
 
-        <div className={styles.section}>
+        
           <PollCommentList key={commentVersion} pollId={+id} />
-        </div>
+        
       </div>
     </div>
   )

@@ -1,27 +1,43 @@
-/* app/components/PollCommentForm.module.css */
-.form {
+
+
+.formContainer {
   width: 100%;
-  margin-top: 12px;
+  margin-top: 16px;
 }
 
-.inputContainer {
+.inputGroup {
   display: flex;
+  align-items: center;
   gap: 8px;
   width: 100%;
 }
 
-.input {
+.commentInput {
   flex: 1;
   padding: 10px 12px;
-  border: 1px solid #ddd;
   border-radius: 12px;
+  resize: none;
+  min-height: 40px;
+  max-height: 120px;
   font-size: 14px;
-  outline: none;
-  transition: border-color 0.2s ease;
+  line-height: 1.5;
+  transition: all 0.2s ease;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: none;
 }
 
-.input:focus {
-  border-color: #999;
+.commentInput:focus {
+  outline: none;
+  box-shadow: 
+    0 1px 3px rgba(0, 0, 0, 0.1),
+    0 0 0 3px rgba(240, 151, 61, 0.2);
+}
+
+.commentInput::placeholder {
+  color: #9ca3af;
+  opacity: 1;
 }
 
 .submitButton {
@@ -30,24 +46,36 @@
   justify-content: center;
   width: 40px;
   height: 40px;
-  background-color: #3b82f6;
+  border-radius: 12px;
+  background-color: var(--main-color);
   color: white;
   border: none;
-  border-radius: 20px;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  padding: 0;
+  box-shadow: 0 2px 4px rgba(240, 151, 61, 0.3);
 }
 
 .submitButton:hover:not(:disabled) {
-  background-color: #2563eb;
+  background-color: var(--accent-color);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 6px rgba(255, 128, 0, 0.3);
+}
+
+.submitButton:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 1px 2px rgba(255, 128, 0, 0.3);
 }
 
 .submitButton:disabled {
-  background-color: #9ca3af;
+  background-color: #e5e7eb;
   cursor: not-allowed;
+  box-shadow: none;
 }
 
-.icon {
+.sendIcon {
   width: 18px;
   height: 18px;
+  stroke-width: 2;
 }
