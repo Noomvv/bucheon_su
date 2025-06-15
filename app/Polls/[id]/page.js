@@ -1,11 +1,12 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useParams }           from 'next/navigation'
-import { supabase }            from '../../../lib/supabaseClient'
-import PollReactions           from '../../components/PollReactions'
-import PollCommentList         from '../../components/PollCommentList'
-import PollCommentForm         from '../../components/PollCommentForm'
+import { useParams } from 'next/navigation'
+import { supabase } from '../../../lib/supabaseClient'
+import PollReactions from '../../components/PollReactions'
+import PollCommentList from '../../components/PollCommentList'
+import PollCommentForm from '../../components/PollCommentForm'
+import styles from './page.module.css'
 
 export default function PollDetailPage() {
   const { id } = useParams()
@@ -23,23 +24,35 @@ export default function PollDetailPage() {
       })
   }, [id])
 
-  if (!poll) return <p>Загрузка…</p>
+  if (!poll) return <div className={styles.loading}>Загрузка…</div>
 
   return (
-    <div style={{ maxWidth: 600, margin: '0 auto', padding: 20 }}>
-      <h1>{poll.question}</h1>
-      <small>
-        Создано: {new Date(poll.created_at).toLocaleString()}
-      </small>
+    <div className={styles.container}>
+      <div className={styles.content}>
+        <div className={styles.pollSection}>
+          <div className={styles.pollHeader}>
+            <h1 className={styles.pollTitle}>{poll.question}</h1>
+            <small className={styles.pollDate}>
+              Создано: {new Date(poll.created_at).toLocaleString()}
+            </small>
+          </div>
+          
+          <div className={styles.reactionsWrapper}>
+            <PollReactions pollId={+id} />
+          </div>
+        </div>
 
-      <PollReactions pollId={+id} />
+        <div className={styles.section}>
+          <PollCommentForm
+            pollId={+id}
+            onCommented={() => setCommentVersion(v => v + 1)}
+          />
+        </div>
 
-      {/* Remounts to refetch when commentVersion changes */}
-      <PollCommentForm
-        pollId={+id}
-        onCommented={() => setCommentVersion(v => v + 1)}
-      />
-      <PollCommentList key={commentVersion} pollId={+id} />
+        <div className={styles.section}>
+          <PollCommentList key={commentVersion} pollId={+id} />
+        </div>
+      </div>
     </div>
   )
 }

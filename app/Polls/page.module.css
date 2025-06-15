@@ -1,4 +1,3 @@
-/* app/polls/page.module.css */
 .container {
   width: 95%;
   margin: 0 auto;
@@ -6,66 +5,26 @@
 }
 
 .content {
+  max-width: 600px;
+  margin: 0 auto;
+  
+}
+
+.button {
   width: 100%;
-  margin: 0;
-  padding: 0;
-}
-/*  */
-.promoWrapper {
-  position: relative; /* Родитель для абсолютного позиционирования изображения */
-  width: 100%;
-    margin: 0 auto;
-    padding: 0;
-    margin-bottom: 1.5rem;
-}
-
-.promoBlock {
-  background-color: rgba(255, 156, 49, 0.269); /* Основной цвет блока */
-  color: white;
-  border-radius: 12px; /* Закругленные углы */
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.05); /* Тень */
-  overflow: hidden; /* Обрезаем содержимое по границе блока */
-  width: 100%; /* Блок занимает всю ширину wrapper */
-  display: flex;
-  align-items: center; /* Выравниваем текст по вертикали */
-  padding: 15px 10px 15px 100px; /* Отступы внутри блока */
-  margin-top: 20px;
+  padding: 8px 0;
+  background-color: white;
+  color: #333;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: normal;
+  transition: all 0.2s ease;
+  margin-bottom: 16px;
 }
 
-.promoText {
-  margin: 0;
-    color: var(--text-color);
-    font-size: 0.9rem;
-    line-height: 1.3;
-    color: var(--text-color);
-}
-
-.promoImageOverlap {
-  position: absolute; /* Позиционируем абсолютно относительно .promo-wrapper */
-    bottom: 0; /* Привязываем нижний край изображения к нижнему краю .promo-wrapper */
-    left: 10px; /* Отступ от левого края .promo-wrapper */
-    max-width: 80px; /* Ширина изображения */
-    height: auto; /* Автоматическая высота для сохранения пропорций */
-    z-index: 1; /* Убедимся, что изображение поверх .promo-block */
-}
-
-/* Адаптация для маленьких экранов */
-@media (max-width: 300px) {
-  .promoWrapper {
-    margin: 20px 10px; /* Уменьшаем горизонтальные отступы */
-    max-width: none; /* Убираем ограничение ширины */
-  }
-
-  .promoBlock {
-    padding: 10px 10px 10px 80px; /* Уменьшаем отступы для текста */
-  }
-
-  .promoImageOverlap {
-    top: -20px; /* Уменьшаем выход изображения за верхнюю часть блока */
-    max-width: 60px; /* Уменьшаем размер изображения */
-  }
-
-  .promoText {
-    font-size: 1rem; /* Уменьшаем размер текста */
-  }
+.button:hover {
+  background-color: #f5f5f5;
+  border-color: #ccc;
 }

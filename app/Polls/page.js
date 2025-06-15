@@ -1,15 +1,16 @@
 'use client'
 
-import { useState }         from 'react'
-import PollList             from '../components/PollList'
-import PollCreationForm     from '../components/PollCreationForm'
+import { useState } from 'react'
+import PollList from '../components/PollList'
+import PollCreationForm from '../components/PollCreationForm'
+import styles from './page.module.css'
 
 // TODO: move this secret into an env var in real deployments
 const ADMIN_SECRET = 'Софочка'
 
 export default function PollsPage() {
   const [pollVersion, setPollVersion] = useState(0)
-  const [isAdmin, setIsAdmin]         = useState(false)
+  const [isAdmin, setIsAdmin] = useState(false)
 
   const handleAdminAccess = () => {
     const answer = prompt('Введите секретное слово для создания опроса:')
@@ -21,23 +22,22 @@ export default function PollsPage() {
   }
 
   const handleCreated = () => {
-    // bump to refresh list, hide form again
     setPollVersion(v => v + 1)
     setIsAdmin(false)
   }
 
   return (
-    <div style={{ maxWidth: 600, margin: '0 auto', padding: 20 }}>
-      {/* remount to refetch when pollVersion changes */}
+    <div className={styles.container}>
+      <div className={styles.content}>
         <PollList key={pollVersion} />
         {!isAdmin ? (
-        <button onClick={handleAdminAccess} style={{ marginBottom: 16 }}>
-          Добавить опрос
-        </button>
-      ) : (
-        <PollCreationForm onCreated={handleCreated} />
-      )}
-
+          <button onClick={handleAdminAccess} className={styles.button}>
+            Добавить опрос
+          </button>
+        ) : (
+          <PollCreationForm onCreated={handleCreated} />
+        )}
+      </div>
     </div>
   )
 }
