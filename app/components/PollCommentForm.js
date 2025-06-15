@@ -1,4 +1,3 @@
-// app/components/PollCommentForm.js
 'use client'
 
 import { useState } from 'react'
@@ -8,48 +7,51 @@ import styles from './PollCommentForm.module.css'
 
 export default function PollCommentForm({ pollId, onCommented }) {
   const [text, setText] = useState('')
-  const [submitting, setSub] = useState(false)
 
-  const submit = async e => {
+  const handleSubmit = async e => {
     e.preventDefault()
-    const { data: session } = await supabase.auth.getSession()
-    if (!session.session) {
-      alert('Пожалуйста, войдите.')
+    if (!text.trim()) return
+
+    const { data: sess } = await supabase.auth.getSession()
+    if (!sess.session) {
+      alert('Войдите, чтобы комментировать.')
       return
     }
-    setSub(true)
-    await supabase
+
+    const { error } = await supabase
       .from('poll_comments')
       .insert({
         poll_id: pollId,
-        user_id: session.session.user.id,
-        comment: text
+        user_id: sess.session.user.id,
+        comment: text.trim()
       })
-    setText('')
-    setSub(false)
-    onCommented()
+
+    if (error) {
+      console.error(error)
+      alert('Не удалось отправить комментарий.')
+    } else {
+      setText('')
+      onCommented()
+    }
   }
 
   return (
-    <form onSubmit={submit} className={styles.form}>
-      <div className={styles.inputContainer}>
-        <input
-          type="text"
+    <form onSubmit={handleSubmit} className={styles.formContainer}>
+      <div className={styles.inputGroup}>
+        <textarea
           value={text}
           onChange={e => setText(e.target.value)}
-          placeholder="Написать комментарий..."
-          className={styles.input}
+          placeholder="Ваш комментарий…"
+          rows={1}
+          className={styles.commentInput}
         />
         <button 
           type="submit" 
-          disabled={submitting || !text.trim()}
-          className={styles.submitButton}
+          className={styles.submitButton} 
+          disabled={!text.trim()}
+          aria-label="Отправить комментарий"
         >
-          {submitting ? (
-            '...'
-          ) : (
-            <PaperAirplaneIcon className={styles.icon} />
-          )}
+          <PaperAirplaneIcon className={styles.sendIcon} />
         </button>
       </div>
     </form>
