@@ -1,57 +1,50 @@
-// app/components/PollCommentForm.js
 'use client'
 
 import { useState } from 'react'
 import { supabase } from '../../lib/supabaseClient'
-import { PaperAirplaneIcon } from '@heroicons/react/24/outline'
-import styles from './PollCommentForm.module.css'
 
 export default function PollCommentForm({ pollId, onCommented }) {
   const [text, setText] = useState('')
-  const [submitting, setSub] = useState(false)
 
-  const submit = async e => {
+  const handleSubmit = async e => {
     e.preventDefault()
-    const { data: session } = await supabase.auth.getSession()
-    if (!session.session) {
-      alert('Пожалуйста, войдите.')
+    if (!text.trim()) return
+
+    const { data: sess } = await supabase.auth.getSession()
+    if (!sess.session) {
+      alert('Войдите, чтобы комментировать.')
       return
     }
-    setSub(true)
-    await supabase
+
+    const { error } = await supabase
       .from('poll_comments')
       .insert({
         poll_id: pollId,
-        user_id: session.session.user.id,
-        comment: text
+        user_id: sess.session.user.id,
+        comment: text.trim()
       })
-    setText('')
-    setSub(false)
-    onCommented()
+
+    if (error) {
+      console.error(error)
+      alert('Не удалось отправить комментарий.')
+    } else {
+      setText('')
+      onCommented()
+    }
   }
 
   return (
-    <form onSubmit={submit} className={styles.form}>
-      <div className={styles.inputContainer}>
-        <input
-          type="text"
-          value={text}
-          onChange={e => setText(e.target.value)}
-          placeholder="Написать комментарий..."
-          className={styles.input}
-        />
-        <button 
-          type="submit" 
-          disabled={submitting || !text.trim()}
-          className={styles.submitButton}
-        >
-          {submitting ? (
-            '...'
-          ) : (
-            <PaperAirplaneIcon className={styles.icon} />
-          )}
-        </button>
-      </div>
+    <form onSubmit={handleSubmit} style={{ marginTop: 16 }}>
+      <textarea
+        value={text}
+        onChange={e => setText(e.target.value)}
+        placeholder="Ваш комментарий…"
+        rows={3}
+        style={{ width: '100%', padding: 8 }}
+      />
+      <button type="submit" style={{ marginTop: 8 }}>
+        Отправить
+      </button>
     </form>
   )
 }

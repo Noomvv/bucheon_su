@@ -1,26 +1,45 @@
-// app/polls/page.js
 'use client'
 
-import AddPollButton from '../components/AddPollButton'
-import PollList from '../components/PollList'
-import styles from './page.module.css'
+import { useState }         from 'react'
+import PollList             from '../components/PollList'
+import PollCreationForm     from '../components/PollCreationForm'
+
+// TODO: move this secret into an env var in real deployments
+const ADMIN_SECRET = 'Софочка'
 
 export default function PollsPage() {
+  const [pollVersion, setPollVersion] = useState(0)
+  const [isAdmin, setIsAdmin]         = useState(false)
+
+  const handleAdminAccess = () => {
+    const answer = prompt('Введите секретное слово для создания опроса:')
+    if (answer === ADMIN_SECRET) {
+      setIsAdmin(true)
+    } else {
+      alert('Неверное секретное слово.')
+    }
+  }
+
+  const handleCreated = () => {
+    // bump to refresh list, hide form again
+    setPollVersion(v => v + 1)
+    setIsAdmin(false)
+  }
+
   return (
-    <div className={styles.container}>
-      <div className={styles.content}>
-        <PollList />
-        <div className={styles.promoWrapper}>
-            <img
-            src="/images/promo4.png" // Указан правильный путь к изображению
-            alt="Человек думает"
-            className={styles.promoImageOverlap}/>
-            <div className={styles.promoBlock}>
-                <div className={styles.promoText}>Опросы от студсовета — голосуй с реакциями и делись мнением в комментариях.</div>
-            </div>
-        </div>
-        <AddPollButton />
-      </div>
+    <div style={{ maxWidth: 600, margin: '0 auto', padding: 20 }}>
+      <h1>Все опросы</h1>
+
+      {!isAdmin ? (
+        <button onClick={handleAdminAccess} style={{ marginBottom: 16 }}>
+          Добавить опрос
+        </button>
+      ) : (
+        <PollCreationForm onCreated={handleCreated} />
+      )}
+
+      {/* remount to refetch when pollVersion changes */}
+      <PollList key={pollVersion} />
     </div>
   )
 }

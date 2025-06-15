@@ -10,9 +10,9 @@ import PollCommentForm         from '../../components/PollCommentForm'
 export default function PollDetailPage() {
   const { id } = useParams()
   const [poll, setPoll] = useState(null)
+  const [commentVersion, setCommentVersion] = useState(0)
 
   useEffect(() => {
-    // load just the poll question & created_at once
     supabase
       .from('polls')
       .select('question, created_at')
@@ -32,14 +32,15 @@ export default function PollDetailPage() {
         Создано: {new Date(poll.created_at).toLocaleString()}
       </small>
 
-      {/* реакции с мгновенным откликом */}
       <PollReactions pollId={+id} />
 
-      {/* комментарии */}
-      <PollCommentList pollId={+id} />
+      {/* Remounts to refetch when commentVersion changes */}
+      <PollCommentList key={commentVersion} pollId={+id} />
 
-      {/* форма добавления нового */}
-      <PollCommentForm pollId={+id} onCommented={() => {/* можно перезагрузить список */}} />
+      <PollCommentForm
+        pollId={+id}
+        onCommented={() => setCommentVersion(v => v + 1)}
+      />
     </div>
   )
 }
