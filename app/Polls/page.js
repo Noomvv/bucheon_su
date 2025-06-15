@@ -30,6 +30,17 @@ export default function PollsPage() {
     <div className={styles.container}>
       <div className={styles.content}>
         <PollList key={pollVersion} />
+
+        <div className={styles.promoWrapper}>
+            <img
+            src="/images/promo4.png" // Указан правильный путь к изображению
+            alt="Человек думает"
+            className={styles.promoImageOverlap}/>
+            <div className={styles.promoBlock}>
+                <div className={styles.promoText}>Опросы от студсовета — голосуй с реакциями и делись мнением в комментариях.</div>
+            </div>
+        </div>
+
         {!isAdmin ? (
           <button onClick={handleAdminAccess} className={styles.button}>
             Добавить опрос
@@ -38,6 +49,8 @@ export default function PollsPage() {
           <PollCreationForm onCreated={handleCreated} />
         )}
       </div>
+
+      
     </div>
   )
 }
