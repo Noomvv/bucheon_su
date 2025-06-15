@@ -1,107 +1,110 @@
-// app/components/PollReactions.js
 'use client'
 
 import { useState, useEffect } from 'react'
-import { supabase }             from '../../lib/supabaseClient'
+import { supabase } from '../../lib/supabaseClient'
+import { 
+  HandThumbUpIcon,
+  HandThumbDownIcon,
+  ScaleIcon
+} from '@heroicons/react/24/outline'
+import styles from './PollReactions.module.css'
 
 export default function PollReactions({ pollId }) {
   const [counts, setCounts] = useState({ yes: 0, maybe: 0, no: 0 })
-  const [myVote, setMyVote] = useState(null)  // null = no vote
+  const [myVote, setMyVote] = useState(null)
 
   useEffect(() => {
-    ;(async () => {
-      // 1) Load all votes
+    const fetchVotes = async () => {
+      // Загрузка текущих голосов
       const { data: votes = [] } = await supabase
         .from('poll_reactions')
         .select('vote, user_id')
         .eq('poll_id', pollId)
 
       setCounts({
-        yes:   votes.filter(v => v.vote === 1).length,
+        yes: votes.filter(v => v.vote === 1).length,
         maybe: votes.filter(v => v.vote === 0).length,
-        no:    votes.filter(v => v.vote === -1).length,
+        no: votes.filter(v => v.vote === -1).length,
       })
 
-      // 2) Load my existing vote (if any)
+      // Проверка текущего голоса пользователя
       const { data: sess } = await supabase.auth.getSession()
       if (sess.session) {
-        const { data: me } = await supabase
+        const { data: myVote } = await supabase
           .from('poll_reactions')
           .select('vote')
           .eq('poll_id', pollId)
           .eq('user_id', sess.session.user.id)
           .single()
-        setMyVote(me?.vote ?? null)
+        setMyVote(myVote?.vote ?? null)
       }
-    })()
+    }
+
+    fetchVotes()
   }, [pollId])
 
-  const handleVote = async v => {
-    const prev = myVote
-    const next = prev === v ? null : v
-
-    // optimistic counts
-    setCounts(c => {
-      const upd = { ...c }
-      // remove old
-      if (prev === 1)   upd.yes--  
-      else if (prev === 0) upd.maybe--  
-      else if (prev === -1) upd.no--  
-      // add new
-      if (next === 1)   upd.yes++  
-      else if (next === 0) upd.maybe++  
-      else if (next === -1) upd.no++  
-      return upd
-    })
-    setMyVote(next)
-
-    // now sync with Supabase
+  const handleVote = async (vote) => {
     const { data: sess } = await supabase.auth.getSession()
     if (!sess.session) {
-      alert('Пожалуйста, войдите.')
+      alert('Для голосования необходимо войти в систему')
       return
     }
-    const uid = sess.session.user.id
 
-    if (next === null) {
-      // user un-voted
-      supabase
+    const userId = sess.session.user.id
+    const newVote = myVote === vote ? null : vote
+
+    // Оптимистичное обновление
+    setCounts(prev => ({
+      yes: prev.yes + (newVote === 1 ? 1 : 0) - (myVote === 1 ? 1 : 0),
+      maybe: prev.maybe + (newVote === 0 ? 1 : 0) - (myVote === 0 ? 1 : 0),
+      no: prev.no + (newVote === -1 ? 1 : 0) - (myVote === -1 ? 1 : 0),
+    }))
+    setMyVote(newVote)
+
+    // Синхронизация с базой данных
+    if (newVote === null) {
+      await supabase
         .from('poll_reactions')
         .delete()
         .eq('poll_id', pollId)
-        .eq('user_id', uid)
-        .then(({ error }) => error && console.error(error))
+        .eq('user_id', userId)
     } else {
-      // upsert new/changed vote
-      supabase
+      await supabase
         .from('poll_reactions')
         .upsert(
-          { poll_id: pollId, user_id: uid, vote: next },
+          { poll_id: pollId, user_id: userId, vote: newVote },
           { onConflict: ['poll_id', 'user_id'] }
         )
-        .then(({ error }) => error && console.error(error))
     }
   }
 
   return (
-    <div style={{ display: 'flex', gap: 12, margin: '16px 0' }}>
+    <div className={styles.container}>
       <button
-        style={{ color: myVote === 1 ? 'green' : undefined }}
+        className={`${styles.button} ${myVote === 1 ? styles.activeYes : ''}`}
         onClick={() => handleVote(1)}
+        aria-label="Голосовать За"
       >
-        👍 {counts.yes}
+        <HandThumbUpIcon className={styles.icon} />
+        <span className={styles.count}>{counts.yes}</span>
       </button>
+
       <button
-        style={{ color: myVote === 0 ? 'orange' : undefined }}
+        className={`${styles.button} ${myVote === 0 ? styles.activeMaybe : ''}`}
         onClick={() => handleVote(0)}
+        aria-label="Голосовать Возможно"
       >
-        🤔 {counts.maybe}
+        <ScaleIcon className={styles.icon} />
+        <span className={styles.count}>{counts.maybe}</span>
       </button>
+
       <button
-        style={{ color: myVote === -1 ? 'red' : undefined }}
+        className={`${styles.button} ${myVote === -1 ? styles.activeNo : ''}`}
         onClick={() => handleVote(-1)}
+        aria-label="Голосовать Против"
       >
-        👎 {counts.no}
+        <HandThumbDownIcon className={styles.icon} />
+        <span className={styles.count}>{counts.no}</span>
       </button>
     </div>
   )

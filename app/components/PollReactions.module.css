@@ -1,0 +1,73 @@
+.container {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}
+
+.button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  flex: 1;
+  padding: 6px 10px;
+  border-radius: 12px;
+  border: none;
+  background: white;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  min-height: 32px;
+}
+
+.button:hover {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
+}
+
+.button:active {
+  transform: translateY(0);
+}
+
+.icon {
+  width: 14px;
+  height: 14px;
+  stroke-width: 2;
+}
+
+.count {
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1;
+}
+
+/* Стили активных состояний */
+.activeYes {
+  background-color: #f0fdf4;
+  border-color: #86efac;
+  color: #15803d;
+}
+
+.activeYes .icon {
+  stroke: #15803d;
+}
+
+.activeMaybe {
+  background-color: #fff7ed;
+  border-color: #fdba74;
+  color: #9a3412;
+}
+
+.activeMaybe .icon {
+  stroke: #9a3412;
+}
+
+.activeNo {
+  background-color: #fef2f2;
+  border-color: #fca5a5;
+  color: #b91c1c;
+}
+
+.activeNo .icon {
+  stroke: #b91c1c;
+}
