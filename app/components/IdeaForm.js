@@ -21,6 +21,7 @@ export default function IdeaForm({ onSuccess }) {
   const [content, setContent] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [formVisible, setFormVisible] = useState(false) // Управление видимостью формы
 
   // Получаем student_id текущего пользователя
   useEffect(() => {
@@ -81,6 +82,7 @@ export default function IdeaForm({ onSuccess }) {
       
       setContent('')
       setCategory('')
+      setFormVisible(false) // Скрываем форму после успешной отправки
       onSuccess?.()
     } catch (err) {
       setError(err.message)
@@ -107,65 +109,70 @@ export default function IdeaForm({ onSuccess }) {
 
   return (
     <div className={styles.outerContainer}>
-      <form onSubmit={handleSubmit} className={styles.form}>
-        {error && (
-          <div className={styles.errorContainer}>
-            <p className={styles.errorText}>{error}</p>
-          </div>
-        )}
-
-        <div className={styles.inputGroup}>
-          {/* <label htmlFor="category" className={styles.label}>
-            Категория:
-          </label> */}
-          <div className={styles.selectContainer}>
-            <select
-              id="category"
-              value={category}
-              onChange={e => setCategory(e.target.value)}
-              required
-              className={styles.select}
-              disabled={loading}
-            >
-              <option value="">Выберите категорию</option>
-              {categories.map(c => (
-                <option key={c} value={c}>{c}</option>
-              ))}
-            </select>
-            <div className={styles.selectArrow}>▼</div>
-          </div>
-        </div>
-
-        <div className={styles.inputGroup}>
-          {/* <label htmlFor="content" className={styles.label}>
-            Текст идеи:
-          </label> */}
-          <textarea
-            id="content"
-            value={content}
-            onChange={e => setContent(e.target.value)}
-            placeholder="Опишите вашу идею максимально подробно..."
-            required
-            className={styles.textarea}
-            disabled={loading}
-            rows={6}
-          />
-        </div>
-
+      {!formVisible ? (
         <div className={styles.buttonContainer}>
           <button
-            type="submit"
-            disabled={loading}
+            onClick={() => setFormVisible(true)} // Показываем форму при нажатии
             className={styles.submitButton}
           >
-            {loading ? (
-              <span className={styles.buttonText}>Отправка...</span>
-            ) : (
-              <span className={styles.buttonText}>Опубликовать идею</span>
-            )}
+            Опубликовать идею
           </button>
         </div>
-      </form>
+      ) : (
+        <form onSubmit={handleSubmit} className={styles.form}>
+          {error && (
+            <div className={styles.errorContainer}>
+              <p className={styles.errorText}>{error}</p>
+            </div>
+          )}
+
+          <div className={styles.inputGroup}>
+            <div className={styles.selectContainer}>
+              <select
+                id="category"
+                value={category}
+                onChange={e => setCategory(e.target.value)}
+                required
+                className={styles.select}
+                disabled={loading}
+              >
+                <option value="">Выберите категорию</option>
+                {categories.map(c => (
+                  <option key={c} value={c}>{c}</option>
+                ))}
+              </select>
+              <div className={styles.selectArrow}>▼</div>
+            </div>
+          </div>
+
+          <div className={styles.inputGroup}>
+            <textarea
+              id="content"
+              value={content}
+              onChange={e => setContent(e.target.value)}
+              placeholder="Опишите вашу идею максимально подробно..."
+              required
+              className={styles.textarea}
+              disabled={loading}
+              rows={6}
+            />
+          </div>
+
+          <div className={styles.buttonContainer}>
+            <button
+              type="submit"
+              disabled={loading}
+              className={styles.submitButton}
+            >
+              {loading ? (
+                <span className={styles.buttonText}>Отправка...</span>
+              ) : (
+                <span className={styles.buttonText}>Опубликовать идею</span>
+              )}
+            </button>
+          </div>
+        </form>
+      )}
     </div>
   )
 }
