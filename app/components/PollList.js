@@ -5,7 +5,6 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabaseClient'
 import PollCard from './PollCard'
 import styles from './PollList.module.css'
-import { ArrowPathIcon } from '@heroicons/react/24/outline'
 
 export default function PollList() {
   const [polls, setPolls] = useState([])
@@ -28,9 +27,13 @@ export default function PollList() {
 
   if (loading) {
     return (
-      <div className={styles.loadingContainer}>
-        <ArrowPathIcon className={styles.loadingIcon} />
-        <span>Загрузка опросов...</span>
+      <div className={styles.listContainer}>
+        {Array.from({ length: 5 }).map((_, index) => (
+          <div key={index} className={styles.skeletonCard}>
+            <div className={styles.skeletonTitle}></div>
+            <div className={styles.skeletonDate}></div>
+          </div>
+        ))}
       </div>
     )
   }

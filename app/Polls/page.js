@@ -33,7 +33,7 @@ export default function PollsPage() {
 
         <div className={styles.promoWrapper}>
             <img
-            src="/images/promo4.png" // Указан правильный путь к изображению
+            src="/images/promo.png" // Указан правильный путь к изображению
             alt="Человек думает"
             className={styles.promoImageOverlap}/>
             <div className={styles.promoBlock}>
@@ -43,7 +43,7 @@ export default function PollsPage() {
 
         {!isAdmin ? (
           <button onClick={handleAdminAccess} className={styles.button}>
-            Добавить опрос
+            Добавить
           </button>
         ) : (
           <PollCreationForm onCreated={handleCreated} />

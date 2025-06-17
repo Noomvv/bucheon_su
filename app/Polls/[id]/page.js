@@ -12,6 +12,7 @@ export default function PollDetailPage() {
   const { id } = useParams()
   const [poll, setPoll] = useState(null)
   const [commentVersion, setCommentVersion] = useState(0)
+  const [loading, setLoading] = useState(true) // Добавлено состояние загрузки
 
   useEffect(() => {
     supabase
@@ -21,10 +22,21 @@ export default function PollDetailPage() {
       .single()
       .then(({ data, error }) => {
         if (!error) setPoll(data)
+        setLoading(false) // Завершаем состояние загрузки
       })
   }, [id])
 
-  if (!poll) return <div className={styles.loading}>Загрузка…</div>
+  if (loading) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.skeletonPoll}>
+          <div className={styles.skeletonTitle}></div>
+          <div className={styles.skeletonDate}></div>
+          <div className={styles.skeletonReactions}></div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className={styles.container}>
@@ -42,16 +54,12 @@ export default function PollDetailPage() {
           </div>
         </div>
 
-        
-          <PollCommentForm
-            pollId={+id}
-            onCommented={() => setCommentVersion(v => v + 1)}
-          />
-        
+        <PollCommentForm
+          pollId={+id}
+          onCommented={() => setCommentVersion(v => v + 1)}
+        />
 
-        
-          <PollCommentList key={commentVersion} pollId={+id} />
-        
+        <PollCommentList key={commentVersion} pollId={+id} />
       </div>
     </div>
   )

@@ -114,8 +114,8 @@
   font-size: 1rem;
   font-weight: 500;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(240, 151, 61, 0.3);
   transition: all 0.2s ease;
+  
 }
 
 .submitButton:hover {

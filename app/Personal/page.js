@@ -117,13 +117,13 @@ export default function PersonalPage() {
         </div>
 
         {/* Stats Block */}
-        <div className={styles.statsBlock}>
+        
           <StatsPanel
             ideasCount={stats.ideasCount}
             totalLikes={stats.totalLikes}
             rank={stats.rank}
           />
-        </div>
+        
 
         {/* Top Message Block */}
         {stats.rank === 1 && (
