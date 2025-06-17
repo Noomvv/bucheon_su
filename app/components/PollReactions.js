@@ -12,6 +12,7 @@ import styles from './PollReactions.module.css'
 export default function PollReactions({ pollId }) {
   const [counts, setCounts] = useState({ yes: 0, maybe: 0, no: 0 })
   const [myVote, setMyVote] = useState(null)
+  const [loaded, setLoaded] = useState(false)
 
   useEffect(() => {
     const fetchVotes = async () => {
@@ -38,10 +39,13 @@ export default function PollReactions({ pollId }) {
           .single()
         setMyVote(myVote?.vote ?? null)
       }
+      setLoaded(true)
     }
 
     fetchVotes()
   }, [pollId])
+
+  if (!loaded) return null
 
   const handleVote = async (vote) => {
     const { data: sess } = await supabase.auth.getSession()

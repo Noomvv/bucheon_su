@@ -12,7 +12,7 @@ import {
 import styles from './Header.module.css';
 
 const pageData = {
-  '/': { title: 'Студенческий актив', icon: <HomeIcon className={styles.icon} /> },
+  '/': { title: 'Студенческий совет', icon: <HomeIcon className={styles.icon} /> },
   '/Personal': { title: 'Личный кабинет', icon: <UserIcon className={styles.icon} /> },
   '/Events': { title: 'События', icon: <CalendarIcon className={styles.icon} /> },
   '/Polls': { title: 'Опросы', icon: <ChartBarIcon className={styles.icon} /> },
