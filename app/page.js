@@ -34,7 +34,7 @@ export default function StudentCouncil() {
             <span className={styles.logoText}>BUT Eagles</span>
           </div>
           <p className={styles.logoDescription}>
-            Нынешняя команда студенческого совета.
+            Нынешняя команда студенческого совета
           </p>
         </section>
 
