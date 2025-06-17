@@ -187,7 +187,17 @@ export default function IdeaList() {
         </select>
       </div>
 
-      {loading && <p className={styles.loading}>Загрузка идей...</p>}
+      {loading && (
+        <div className={styles.listContainer}>
+          {Array.from({ length: 5 }).map((_, index) => (
+            <div key={index} className={styles.skeletonCard}>
+              <div className={styles.skeletonTitle}></div>
+              <div className={styles.skeletonMeta}></div>
+              <div className={styles.skeletonButtons}></div>
+            </div>
+          ))}
+        </div>
+      )}
 
       {!loading && ideas.length === 0 && (
         <div className={styles.emptyState}>
