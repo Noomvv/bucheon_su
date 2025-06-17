@@ -1,4 +1,7 @@
-import styles from './page.module.css';
+'use client'
+
+import { useState } from 'react'
+import styles from './page.module.css'
 import {
   AcademicCapIcon,
   UserIcon,
@@ -9,9 +12,18 @@ import {
   RocketLaunchIcon,
   MagnifyingGlassIcon,
   StarIcon
-} from '@heroicons/react/24/outline';
+} from '@heroicons/react/24/outline'
 
 export default function StudentCouncil() {
+  const [openBlocks, setOpenBlocks] = useState({}) // Управление видимостью блоков
+
+  const toggleBlock = (block) => {
+    setOpenBlocks((prev) => ({
+      ...prev,
+      [block]: !prev[block], // Переключаем видимость блока
+    }))
+  }
+
   return (
     <div className={styles.wrapper}>
       <div className={styles.container}>
@@ -39,48 +51,58 @@ export default function StudentCouncil() {
         </header>
 
         <div className={styles.content}>
+          {/* Блок "Наша миссия" */}
           <div className={styles.block}>
-            <h2 className={styles.blockTitle}>
+            <h2
+              className={styles.blockTitle}
+              onClick={() => toggleBlock('mission')} // Переключаем видимость
+            >
               <StarIcon className={styles.blockIcon} />
               Наша миссия
             </h2>
-            <p>
-              Представляем интересы студентов, организуем мероприятия и воплощаем идеи в жизнь. Ваш голос, ваша активность, ваша платформа для изменений.
-            </p>
+            <div
+              className={`${styles.blockContent} ${
+                openBlocks.mission ? styles.blockContentOpen : ''
+              }`}
+            >
+              <p>
+                Представляем интересы студентов, организуем мероприятия и воплощаем идеи в жизнь. Ваш голос, ваша активность, ваша платформа для изменений.
+              </p>
+            </div>
           </div>
 
+          {/* Блок "Возможности" */}
           <div className={styles.block}>
-            <h2 className={styles.blockTitle}>
+            <h2
+              className={styles.blockTitle}
+              onClick={() => toggleBlock('opportunities')} // Переключаем видимость
+            >
               <MagnifyingGlassIcon className={styles.blockIcon} />
-              Возможности
+              Что вы здесь найдёте?
             </h2>
-            <ul className={styles.list}>
-              <li>
-                <CalendarIcon className={styles.listIcon} />
-                <span>Актуальный календарь университетских событий</span>
-              </li>
-              <li>
-                <LightBulbIcon className={styles.listIcon} />
-                <span>Платформа для студенческих инициатив</span>
-              </li>
-              <li>
-                <UserGroupIcon className={styles.listIcon} />
-                <span>Знакомство с составом студсовета</span>
-              </li>
-            </ul>
-          </div>
-
-          <div className={styles.block}>
-            <h2 className={styles.blockTitle}>
-              <RocketLaunchIcon className={styles.blockIcon} />
-              Стань частью команды!
-            </h2>
-            <p>
-              Твои идеи могут изменить университет к лучшему. Студенческий совет - это площадка для твоей реализации.
-            </p>
+            <div
+              className={`${styles.blockContent} ${
+                openBlocks.opportunities ? styles.blockContentOpen : ''
+              }`}
+            >
+              <ul className={styles.list}>
+                <li>
+                  <CalendarIcon className={styles.listIcon} />
+                  <span>Актуальный календарь университетских событий</span>
+                </li>
+                <li>
+                  <LightBulbIcon className={styles.listIcon} />
+                  <span>Платформа для студенческих инициатив</span>
+                </li>
+                <li>
+                  <UserGroupIcon className={styles.listIcon} />
+                  <span>Знакомство с составом студсовета</span>
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  );
+  )
 }

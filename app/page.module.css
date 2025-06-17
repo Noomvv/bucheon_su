@@ -3,8 +3,6 @@
   display: flex;
   justify-content: center;
   background-color: var(--bg-color);
-  /* min-height: 100vh; */
-  /* padding: 20px 0; */
 }
 
 .container {
@@ -116,12 +114,25 @@
   margin-bottom: 16px;
   font-size: 1.1rem;
   color: #333;
+  cursor: pointer;
 }
 
 .blockIcon {
   width: 24px;
   height: 24px;
   color: #F0973D;
+}
+
+.blockContent {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease, opacity 0.3s ease;
+  opacity: 0;
+}
+
+.blockContentOpen {
+  max-height: 500px; /* Достаточно большое значение для содержимого */
+  opacity: 1;
 }
 
 .list {
