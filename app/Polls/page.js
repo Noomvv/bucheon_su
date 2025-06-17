@@ -43,7 +43,7 @@ export default function PollsPage() {
 
         {!isAdmin ? (
           <button onClick={handleAdminAccess} className={styles.button}>
-            Добавить опрос
+            Добавить
           </button>
         ) : (
           <PollCreationForm onCreated={handleCreated} />
