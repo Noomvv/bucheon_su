@@ -114,10 +114,6 @@
   font-size: 1rem;
   font-weight: 500;
   cursor: pointer;
-   box-shadow: 
-    0 0 5px var(--main-color),  /* Внутреннее свечение */
-    0 0 5px var(--main-color),  /* Среднее свечение */
-    0 0 5px var(--main-color); /* Внешнее свечение */
   transition: all 0.2s ease;
   
 }
