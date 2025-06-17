@@ -6,9 +6,11 @@ import styles                  from './PollCommentList.module.css'
 
 export default function PollCommentList({ pollId }) {
   const [comments, setComments] = useState([])
+  const [loading, setLoading] = useState(true) // Добавлено состояние загрузки
 
   useEffect(() => {
     (async () => {
+      setLoading(true) // Устанавливаем состояние загрузки
       // 1) Получаем сырые комментарии, сортируя по created_at DESC
       const { data: comms = [], error: commError } = await supabase
         .from('poll_comments')
@@ -18,6 +20,7 @@ export default function PollCommentList({ pollId }) {
 
       if (commError) {
         console.error('Ошибка при загрузке комментариев', commError)
+        setLoading(false)
         return
       }
 
@@ -45,8 +48,22 @@ export default function PollCommentList({ pollId }) {
       })
 
       setComments(merged)
+      setLoading(false) // Завершаем состояние загрузки
     })()
   }, [pollId])
+
+  if (loading) {
+    return (
+      <div className={styles.commentsContainer}>
+        {Array.from({ length: 5 }).map((_, index) => (
+          <div key={index} className={styles.skeletonComment}>
+            <div className={styles.skeletonHeader}></div>
+            <div className={styles.skeletonBody}></div>
+          </div>
+        ))}
+      </div>
+    )
+  }
 
   return (
     <div className={styles.commentsContainer}>
