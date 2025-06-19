@@ -195,6 +195,7 @@
   flex-direction: column;
   gap: 12px;
   animation: pulse 1.5s infinite ease-in-out;
+  margin-bottom: 20px;
 }
 
 .skeletonTitle {
