@@ -31,21 +31,21 @@ export default function StudentCouncil() {
         <section className={styles.logoSection}>
           <div className={styles.logoContainer}>
             <img src='/images/default.webp' className={styles.logoIcon} alt="Logo" />
-            <span className={styles.logoText}>BUT Eagles</span>
+            <span className={styles.logoText}>Student Council</span>
           </div>
           <p className={styles.logoDescription}>
-            Нынешняя команда студенческого совета
+            Команда студенческого совета
           </p>
         </section>
 
         <header className={styles.header}>
           <div className={styles.chairmanContainer}>
             <div className={styles.chairmanPhoto}>
-              <img src='/member-img/kim_andrey.webp' className={styles.photoIcon} alt="Chairman Photo" />
+              <img src='/member-img/default.jpeg' className={styles.photoIcon} alt="Chairman Photo" />
             </div>
             <p className={styles.chairman}>
               Президент совета: <br />
-              Ким Андрей
+              Руслан
             </p>
           </div>
         </header>

@@ -23,39 +23,39 @@ const students = [
     },
     {
         id: 3,
-        firstName: "Андрей",
-        lastName: "Ким",
+        firstName: "Руслан",
+        lastName: "",
         faculty: "Менеджмент",
-        year: 4,
-        telegram: "aldente_02",
-        photoUrl: "/member-img/kim_andrey.webp"
+        year: 2,
+        telegram: "zuz_zyy",
+        photoUrl: "/member-img/default.jpeg"
     },
     {
         id: 4,
-        firstName: "Евгений",
-        lastName: "Ким",
-        faculty: "Мультимедиа",
+        firstName: "Елена",
+        lastName: "Мирзаахмедова",
+        faculty: "Менеджмент",
         year: 2,
-        telegram: "tipo_yujin",
-        photoUrl: "/member-img/yujin.webp"
+        telegram: "mrzxmz",
+        photoUrl: "/member-img/default.jpeg"
     },
     {
         id: 5,
-        firstName: "Малика",
-        lastName: "Азимова",
+        firstName: "Маргарита",
+        lastName: "Пак",
         faculty: "Менеджмент",
-        year: 4,
-        telegram: "MalyJenner",
-        photoUrl: "/member-img/malika.webp"
+        year: 3,
+        telegram: "mpak05",
+        photoUrl: "/member-img/default.jpeg"
     },
     {
         id: 6,
-        firstName: "Вераника",
-        lastName: "Тен",
-        faculty: "Мультимедиа",
-        year: 2,
-        telegram: "vrrrkuf",
-        photoUrl: "/member-img/veranika.webp"
+        firstName: "Карина",
+        lastName: "Тё",
+        faculty: "Менеджмент",
+        year: 3,
+        telegram: "kte_90",
+        photoUrl: "/member-img/default.jpeg"
     },
     {
         id: 7,
@@ -68,130 +68,104 @@ const students = [
     },
     {
         id: 8,
-        firstName: "Маргарита",
-        lastName: "Ким",
-        faculty: "Дошкольное образование",
+        firstName: "Виктор",
+        lastName: "Шек",
+        faculty: "Архитектура",
         year: 3,
-        telegram: "marg_kim",
-        photoUrl: "/member-img/margarita.webp"
+        telegram: "blagodarstvuyu",
+        photoUrl: "/member-img/default.jpeg"
     },
     {
         id: 9,
-        firstName: "Никита",
-        lastName: "Смирнов",
-        faculty: "IT",
+        firstName: "Анастасия",
+        lastName: "Ким",
+        faculty: "Менеджмент",
         year: 3,
-        telegram: "sowiebdbdu",
-        photoUrl: "/member-img/nikita.webp"
+        telegram: "Kimi_Kimiku",
+        photoUrl: "/member-img/default.jpeg"
     },
     {
         id: 10,
-        firstName: "Никита",
-        lastName: "Хегай",
-        faculty: "Менеджмент",
-        year: 4,
-        telegram: "Niki_Cat",
-        photoUrl: "/member-img/h_nikita.webp"
+        firstName: "Игорь",
+        lastName: "Бя",
+        faculty: "E-business",
+        year: 3,
+        telegram: "sb_03i",
+        photoUrl: "/member-img/default.jpeg"
     },
     {
         id: 11,
-        firstName: "Станислав",
-        lastName: "Ем",
-        faculty: "IT",
-        year: 2,
-        telegram: "thefiam",
-        photoUrl: "/member-img/stas.webp"
+        firstName: "Денис",
+        lastName: "Ким",
+        faculty: "E-business",
+        year: 3,
+        telegram: "Mynightmaresss",
+        photoUrl: "/member-img/default.jpeg"
     },
     {
         id: 12,
-        firstName: "Ирина",
-        lastName: "Пан",
+        firstName: "Абдурахмон",
+        lastName: "Икромов",
         faculty: "Мультимедиа",
         year: 2,
-        telegram: "OtherHuman_for_you",
-        photoUrl: "/member-img/irina.webp"
+        telegram: "smackfake",
+        photoUrl: "/member-img/default.jpeg"
     },
     {
         id: 13,
-        firstName: "Вячеслав",
-        lastName: "Ли",
-        faculty: "Мультимедиа",
+        firstName: "Тимур",
+        lastName: "Ким",
+        faculty: "Дошкольное образование",
         year: 2,
-        telegram: "ssluvvik",
-        photoUrl: "/member-img/vyacheslav.webp"
+        telegram: "Apolonirr",
+        photoUrl: "/member-img/default.jpeg"
     },
     {
         id: 14,
-        firstName: "Андрей",
-        lastName: "Чурбанов",
+        firstName: "Павел",
+        lastName: "Хван",
         faculty: "Менеджмент",
-        year: 4,
-        telegram: "kkuro_0",
-        photoUrl: "/member-img/andrey.webp"
+        year: 2,
+        telegram: "kr1d0",
+        photoUrl: "/member-img/default.jpeg"
     },
     {
         id: 15,
-        firstName: "Ернур",
-        lastName: "Сыздыков",
-        faculty: "Менеджмент",
-        year: 4,
-        telegram: "Tax797",
-        photoUrl: "/member-img/ernur.webp"
+        firstName: "Денис",
+        lastName: "Когай",
+        faculty: "E-business",
+        year: 3,
+        telegram: "Mynightmaresss",
+        photoUrl: "/member-img/default.jpeg"
     },
     {
         id: 16,
-        firstName: "Мелисса",
-        lastName: "Пак",
-        faculty: "Дошкольное образование",
-        year: 4,
-        telegram: "meli62_30",
-        photoUrl: "/member-img/melisa.webp"
+        firstName: "Александра",
+        lastName: "Пугачёва",
+        faculty: "Мультимедиа",
+        year: 2,
+        telegram: "alexa0313",
+        photoUrl: "/member-img/default.jpeg"
     },
     {
         id: 17,
-        firstName: "Михаил",
-        lastName: "Тян",
-        faculty: "Менеджмент",
-        year: 4,
-        telegram: "mtlll13",
+        firstName: "Виктория",
+        lastName: "Сон",
+        faculty: "Мультимедиа",
+        year: 2,
+        telegram: "sv07_15",
         photoUrl: "/member-img/default.jpeg"
     },
     {
         id: 18,
-        firstName: "Вероника ",
-        lastName: "Ли",
-        faculty: "Менеджмент",
-        year: 4,
-        telegram: "kakoolya",
-        photoUrl: "/member-img/veronika.webp"
+        firstName: "Карина ",
+        lastName: "Сагидулина",
+        faculty: "Мультимедиа",
+        year: 2,
+        telegram: "kte_90",
+        photoUrl: "/member-img/default.jpeg"
     },
-    {
-        id: 19,
-        firstName: "Камила",
-        lastName: "Султанова",
-        faculty: "Менеджмент",
-        year: 4,
-        telegram: "camaaa_s",
-        photoUrl: "/member-img/kamila.webp"
-    },
-    {
-        id: 20,
-        firstName: "Евгений",
-        lastName: "Ко",
-        faculty: "Менеджмент",
-        year: 4,
-        telegram: "eugeneheat",
-        photoUrl: "/member-img/evgeniy.webp"
-    },
-    {
-        id: 21,
-        firstName: "Амирбек",
-        lastName: "Ашуров",
-        faculty: "Менеджмент",
-        year: 4,
-        telegram: "avvorld",
-        photoUrl: "/member-img/amir.webp"
-    },
+    
     
   // Добавьте остальных участников здесь
 ];
