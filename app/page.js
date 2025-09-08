@@ -45,7 +45,7 @@ export default function StudentCouncil() {
             </div>
             <p className={styles.chairman}>
               Президент совета: <br />
-              Руслан
+              Кустиков Руслан
             </p>
           </div>
         </header>

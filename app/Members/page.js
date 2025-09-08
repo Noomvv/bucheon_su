@@ -24,7 +24,7 @@ const students = [
     {
         id: 3,
         firstName: "Руслан",
-        lastName: "",
+        lastName: "Кустиков",
         faculty: "Менеджмент",
         year: 2,
         telegram: "zuz_zyy",
