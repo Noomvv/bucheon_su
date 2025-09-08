@@ -190,7 +190,7 @@ export default function AuthForm() {
             alt="Человек думает"
             className={styles.promoImageOverlap}/>
             <div className={styles.promoBlock}>
-                <div className={styles.promoText}>Все пароли шифруются: Supabase использует bcrypt-хеширование.</div>
+                <div className={styles.promoText}>Все пароли шифруются с использованием bcrypt-хеширования.</div>
             </div>
         </div>
     </div>
