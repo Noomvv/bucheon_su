@@ -1,3 +1,4 @@
+// app/Personal/page.js
 'use client'
 
 import { useState, useEffect } from 'react'
@@ -15,7 +16,11 @@ export default function PersonalPage() {
   const [session, setSession] = useState(null)
   const [student, setStudent] = useState(null)
   const [studentId, setStudentId] = useState(null)
-  const [stats, setStats] = useState({ ideasCount: 0, totalLikes: 0, rank: null })
+  const [stats, setStats] = useState({ 
+    ideasCount: 0, 
+    totalLikes: 0, 
+    volunteerHours: 0 // Добавляем часы волонтерства
+  })
   const [notifications, setNotifications] = useState([])
 
   useEffect(() => {
@@ -29,7 +34,7 @@ export default function PersonalPage() {
       if (!session) {
         setStudent(null)
         setStudentId(null)
-        setStats({ ideasCount: 0, totalLikes: 0, rank: null })
+        setStats({ ideasCount: 0, totalLikes: 0, volunteerHours: 0 })
         setNotifications([])
         return
       }
@@ -44,6 +49,7 @@ export default function PersonalPage() {
       setStudent({ firstname: stud.firstname, lastname: stud.lastname })
       setStudentId(stud.student_id)
 
+      // Загрузка статистики идей
       const { data: ideas } = await supabase
         .from('ideas')
         .select('student_id, content, idea_votes(vote)')
@@ -58,17 +64,21 @@ export default function PersonalPage() {
       const ideasCount = ideas.filter(i => i.student_id === stud.student_id).length
       const totalLikes = likesMap[stud.student_id] || 0
 
-      const sortedIds = Object.entries(likesMap)
-        .sort((a, b) => b[1] - a[1])
-        .map(([id]) => Number(id))
-      const rank = sortedIds.indexOf(stud.student_id) + 1
+      // Загрузка часов волонтерства
+      const { data: volunteer } = await supabase
+        .from('volunteers')
+        .select('total_hours')
+        .eq('student_id', stud.student_id) // Используем числовой student_id
+        .single()
+
+      const volunteerHours = volunteer?.total_hours || 0
 
       const notes = ideas
         .filter(i => i.student_id === stud.student_id)
         .filter(i => i.idea_votes.filter(v => v.vote === 1).length >= LIKE_THRESHOLD)
         .map(i => `Ваша идея «${i.content}» набрала ${LIKE_THRESHOLD}+ лайков и отправлена на рассмотрение.`)
 
-      setStats({ ideasCount, totalLikes, rank })
+      setStats({ ideasCount, totalLikes, volunteerHours })
       setNotifications(notes)
     }
 
@@ -117,19 +127,19 @@ export default function PersonalPage() {
         </div>
 
         {/* Stats Block */}
-        
-          <StatsPanel
-            ideasCount={stats.ideasCount}
-            totalLikes={stats.totalLikes}
-            rank={stats.rank}
-          />
-        
+        <StatsPanel
+          ideasCount={stats.ideasCount}
+          totalLikes={stats.totalLikes}
+          volunteerHours={stats.volunteerHours} // Передаем часы вместо ранга
+        />
 
         {/* Top Message Block */}
-        {stats.rank === 1 && (
+        {stats.volunteerHours > 0 && (
           <div className={styles.topMessageBlock}>
             <div className={styles.topMessageContent}>
-              Ваши идеи самые популярные среди студентов! 🎉
+              {stats.volunteerHours >= 50 ? '🏆 Вы активный волонтер!' : 
+               stats.volunteerHours >= 20 ? '👍 Спасибо за вашу помощь!' :
+               '🌟 Вы начинающий волонтер!'}
             </div>
           </div>
         )}
