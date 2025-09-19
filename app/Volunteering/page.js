@@ -32,17 +32,7 @@ export default function VolunteeringPage() {
           />
           <p className={styles.text}>Supporting local communities</p>
         </div>
-
-        <div className={styles.card}>
-          <Image
-            src="/volunteering-img/3.svg"
-            alt="University volunteering"
-            width={300}
-            height={200}
-            className={styles.image}
-          />
-          <p className={styles.text}>Campus volunteering</p>
-        </div>
+        
       </div>
 
         <div className={styles.promoWrapper}>
