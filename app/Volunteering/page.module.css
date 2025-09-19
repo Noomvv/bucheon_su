@@ -106,3 +106,144 @@
 .button:hover {
   background: var(--accent-color);
 }
+
+/* Таблица волонтеров - компактная */
+.topContainer {
+  margin: 1rem 0;
+  padding: 1rem;
+  background: var(--bg-color);
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--border-color);
+}
+
+.topTitle {
+  text-align: center;
+  margin-bottom: 1rem;
+  color: var(--main-color);
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.statsContainer {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.statCard {
+  background: var(--main-color);
+  color: white;
+  padding: 0.8rem 1rem;
+  border-radius: 8px;
+  text-align: center;
+  min-width: 120px;
+}
+
+.statNumber {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+  line-height: 1;
+}
+
+.statLabel {
+  font-size: 0.8rem;
+  opacity: 0.9;
+  margin: 0.3rem 0 0 0;
+}
+
+.tableContainer {
+  overflow-x: auto;
+  border-radius: 8px;
+  margin: 0 -0.5rem;
+}
+
+.topTable {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: var(--bg-color);
+  font-size: 0.9rem;
+}
+
+.topTable thead {
+  background: var(--main-color);
+}
+
+.topTable th {
+  color: white;
+  padding: 0.6rem 0.5rem;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+.topTable th:first-child {
+  border-top-left-radius: 6px;
+  padding-left: 0.8rem;
+}
+
+.topTable th:last-child {
+  border-top-right-radius: 6px;
+  padding-right: 0.8rem;
+}
+
+.topTable td {
+  padding: 0.6rem 0.5rem;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-color);
+}
+
+.topTable tr:last-child td {
+  border-bottom: none;
+}
+
+.topTable tr:nth-child(even) {
+  background-color: var(--block-color);
+}
+
+.topTable tr:hover {
+  background-color: #ffe6cc;
+}
+
+.hours {
+  font-weight: 600;
+  color: var(--main-color);
+  background: #fff0e0;
+  padding: 0.2rem 0.6rem;
+  border-radius: 12px;
+  display: inline-block;
+  min-width: 40px;
+  text-align: center;
+  border: 1px solid var(--border-color);
+  font-size: 0.8rem;
+}
+
+.rank {
+  font-weight: 600;
+  color: var(--main-color);
+  font-size: 0.9rem;
+  padding-left: 0.8rem !important;
+}
+
+.name {
+  font-weight: 500;
+  color: var(--text-color);
+  font-size: 0.85rem;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.faculty {
+  color: var(--text-color);
+  font-size: 0.75rem;
+  opacity: 0.8;
+  max-width: 100px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
