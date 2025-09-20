@@ -1,30 +1,30 @@
 // app/auth/update-password/page.js
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useState, useEffect, Suspense } from 'react'
+import { useRouter } from 'next/navigation'
 import { supabase } from '../../../lib/supabaseClient'
 import styles from './page.module.css'
 
-export default function UpdatePasswordPage() {
+// Компонент-обертка с Suspense
+function UpdatePasswordContent() {
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const [loading, setLoading] = useState(false)
   const router = useRouter()
-  const searchParams = useSearchParams()
 
   useEffect(() => {
-    // Проверяем, есть ли access_token в URL (это добавит Supabase)
-    const accessToken = searchParams.get('access_token')
-    const tokenType = searchParams.get('token_type')
+    // Проверяем параметры URL на клиентской стороне
+    const urlParams = new URLSearchParams(window.location.search)
+    const accessToken = urlParams.get('access_token')
+    const tokenType = urlParams.get('token_type')
     
     if (accessToken && tokenType) {
-      // Supabase автоматически обработает это
       console.log('Password reset token detected')
     }
-  }, [searchParams])
+  }, [])
 
   const handleUpdatePassword = async (e) => {
     e.preventDefault()
@@ -113,5 +113,20 @@ export default function UpdatePasswordPage() {
         )}
       </div>
     </div>
+  )
+}
+
+// Главный компонент с Suspense
+export default function UpdatePasswordPage() {
+  return (
+    <Suspense fallback={
+      <div className={styles.container}>
+        <div className={styles.card}>
+          <h2 className={styles.title}>Загрузка...</h2>
+        </div>
+      </div>
+    }>
+      <UpdatePasswordContent />
+    </Suspense>
   )
 }
