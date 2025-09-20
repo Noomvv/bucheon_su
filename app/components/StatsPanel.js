@@ -2,7 +2,7 @@
 
 import styles from './StatsPanel.module.css'
 
-export default function StatsPanel({ ideasCount, totalLikes, rank }) {
+export default function StatsPanel({ ideasCount, totalLikes, volunteerHours }) {
   return (
     <div className={styles.stats}>
       <div className={styles.statCard}>
@@ -14,8 +14,8 @@ export default function StatsPanel({ ideasCount, totalLikes, rank }) {
         <div className={styles.statLabel}>Всего лайков</div>
       </div>
       <div className={styles.statCard}>
-        <div className={styles.statValue}>{rank || '—'}</div>
-        <div className={styles.statLabel}>Место в рейтинге</div>
+        <div className={styles.statValue}>{volunteerHours}</div>
+        <div className={styles.statLabel}>Часов волонтерства</div>
       </div>
     </div>
   )

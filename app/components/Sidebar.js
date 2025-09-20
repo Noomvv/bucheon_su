@@ -20,6 +20,7 @@ export default function Sidebar({ children }) {
         <nav className={styles.sidebarNav}>
           <a href="/Members" className={styles.sidebarLink}>Состав совета</a>
           <a href="/public/su.pdf" className={styles.sidebarLink}>Положение</a>
+          <a href="/Volunteering" className={styles.sidebarLink}>Волонтерство</a>
         </nav>
       </div>
     </>

@@ -18,6 +18,7 @@ const pageData = {
   '/Polls': { title: 'Опросы', icon: <ChartBarIcon className={styles.icon} /> },
   '/Ideas': { title: 'Идеи', icon: <LightBulbIcon className={styles.icon} /> },
   '/Members': { title: 'Состав совета', icon: <UserGroupIcon className={styles.icon} /> },
+  '/Volunteering': { title: 'Волонтерство', icon: <UserGroupIcon className={styles.icon} /> },
 };
 
 export default function Header() {
