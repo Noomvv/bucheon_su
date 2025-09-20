@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import styles from './page.module.css'
+import Alert from './components/Alert'
 import {
   AcademicCapIcon,
   UserIcon,
@@ -49,6 +50,12 @@ export default function StudentCouncil() {
             </p>
           </div>
         </header>
+
+        <Alert>
+          👋 Привет, первокурсники!
+Пока у нас нет базы с вашими данными, поэтому зарегистрироваться через систему не получится.
+Чтобы зарегистрироваться, напишите в Telegram 👉 @v_v_moon
+        </Alert>
 
         <div className={styles.content}>
           {/* Блок "Наша миссия" */}
