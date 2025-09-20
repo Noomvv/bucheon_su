@@ -1,3 +1,4 @@
+// components/AuthForm.js
 'use client'
 
 import { useState } from 'react'
@@ -5,20 +6,22 @@ import { useRouter } from 'next/navigation'
 import { supabase } from '../../lib/supabaseClient'
 import styles from './AuthForm.module.css'
 
-export default function AuthForm() {
+export default function AuthForm({ onSuccess }) {
   const router = useRouter()
-  const [mode, setMode] = useState('login') // 'login' | 'register'
+  const [mode, setMode] = useState('login') // 'login' | 'register' | 'forgot'
   const [studentId, setStudentId] = useState('')
   const [login, setLogin] = useState('')
   const [password, setPassword] = useState('')
   const [confirm, setConfirm] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [emailSent, setEmailSent] = useState(false)
 
-  const switchMode = () => {
+  const switchMode = (newMode) => {
     setError('')
     setLoading(false)
-    setMode(mode === 'login' ? 'register' : 'login')
+    setEmailSent(false)
+    setMode(newMode)
   }
 
   const handleLogin = async e => {
@@ -35,7 +38,11 @@ export default function AuthForm() {
     if (error) {
       setError(error.message)
     } else {
-      router.push('/Personal')
+      if (onSuccess) {
+        onSuccess()
+      } else {
+        router.push('/Personal')
+      }
     }
   }
 
@@ -95,12 +102,105 @@ export default function AuthForm() {
 
       if (e4) throw e4
 
-      router.push('/Personal')
+      if (onSuccess) {
+        onSuccess()
+      } else {
+        router.push('/Personal')
+      }
     } catch (err) {
       setError(err.message)
     } finally {
       setLoading(false)
     }
+  }
+
+  const handleForgotPassword = async e => {
+    e.preventDefault()
+    setError('')
+    setLoading(true)
+
+    if (!login.trim()) {
+      setError('Введите email')
+      setLoading(false)
+      return
+    }
+
+    const { error } = await supabase.auth.resetPasswordForEmail(login, {
+      redirectTo: `${window.location.origin}/auth/update-password`,
+    })
+
+    setLoading(false)
+    if (error) {
+      setError(error.message)
+    } else {
+      setEmailSent(true)
+    }
+  }
+
+  if (mode === 'forgot') {
+    return (
+      <div className={styles.container}>
+        <h2 className={styles.title}>Восстановление пароля</h2>
+
+        {emailSent ? (
+          <div className={styles.successMessage}>
+            <p>Письмо с инструкциями отправлено на {login}</p>
+            <p>Проверьте вашу почту и следуйте инструкциям</p>
+            <button
+              onClick={() => switchMode('login')}
+              className={styles.switchButton}
+            >
+              Вернуться к входу
+            </button>
+          </div>
+        ) : (
+          <form onSubmit={handleForgotPassword} className={styles.form}>
+            <label className={styles.label}>
+              Ваш email:
+              <input
+                type="email"
+                value={login}
+                onChange={e => setLogin(e.target.value)}
+                required
+                className={styles.input}
+                placeholder="Введите email для восстановления"
+              />
+            </label>
+
+            {error && <p className={styles.error}>{error}</p>}
+
+            <button
+              type="submit"
+              disabled={loading}
+              className={styles.submitButton}
+            >
+              {loading ? 'Отправка...' : 'Восстановить пароль'}
+            </button>
+
+            <p className={styles.switchText}>
+              Вспомнили пароль?
+              <button
+                onClick={() => switchMode('login')}
+                className={styles.switchButton}
+              >
+                Войти
+              </button>
+            </p>
+          </form>
+        )}
+
+        <div className={styles.promoWrapper}>
+          <img
+            src="/images/promo.png"
+            alt="Человек думает"
+            className={styles.promoImageOverlap}
+          />
+          <div className={styles.promoBlock}>
+            <div className={styles.promoText}>Все пароли шифруются с использованием bcrypt-хеширования.</div>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -123,6 +223,7 @@ export default function AuthForm() {
                 onChange={e => setStudentId(e.target.value)}
                 required
                 className={styles.input}
+                placeholder="Введите ваш Student ID"
               />
             </label>
           </>
@@ -131,11 +232,12 @@ export default function AuthForm() {
         <label className={styles.label}>
           Ваш email:
           <input
-            type="text"
+            type="email"
             value={login}
             onChange={e => setLogin(e.target.value)}
             required
             className={styles.input}
+            placeholder="example@email.com"
           />
         </label>
 
@@ -147,6 +249,7 @@ export default function AuthForm() {
             onChange={e => setPassword(e.target.value)}
             required
             className={styles.input}
+            placeholder="Не менее 8 символов"
           />
         </label>
 
@@ -159,6 +262,7 @@ export default function AuthForm() {
               onChange={e => setConfirm(e.target.value)}
               required
               className={styles.input}
+              placeholder="Повторите пароль"
             />
           </label>
         )}
@@ -175,24 +279,51 @@ export default function AuthForm() {
       </form>
 
       <p className={styles.switchText}>
-        {mode === 'login' ? 'Нет аккаунта?' : 'Есть аккаунт?'}
-        <button
-          onClick={switchMode}
-          className={styles.switchButton}
-        >
-          {mode === 'login' ? 'Регистрация' : 'Вход'}
-        </button>
+        {mode === 'login' ? (
+          <>
+            Нет аккаунта?
+            <button
+              onClick={() => switchMode('register')}
+              className={styles.switchButton}
+            >
+              Регистрация
+            </button>
+          </>
+        ) : (
+          <>
+            Есть аккаунт?
+            <button
+              onClick={() => switchMode('login')}
+              className={styles.switchButton}
+            >
+              Вход
+            </button>
+          </>
+        )}
       </p>
 
-        <div className={styles.promoWrapper}>
-            <img
-            src="/images/promo.png" // Указан правильный путь к изображению
-            alt="Человек думает"
-            className={styles.promoImageOverlap}/>
-            <div className={styles.promoBlock}>
-                <div className={styles.promoText}>Все пароли шифруются с использованием bcrypt-хеширования.</div>
-            </div>
+      {mode === 'login' && (
+        <p className={styles.forgotText}>
+          Забыли пароль?
+          <button
+            onClick={() => switchMode('forgot')}
+            className={styles.forgotButton}
+          >
+            Восстановить
+          </button>
+        </p>
+      )}
+
+      <div className={styles.promoWrapper}>
+        <img
+          src="/images/promo.png"
+          alt="Человек думает"
+          className={styles.promoImageOverlap}
+        />
+        <div className={styles.promoBlock}>
+          <div className={styles.promoText}>Все пароли шифруются с использованием bcrypt-хеширования.</div>
         </div>
+      </div>
     </div>
   )
 }
