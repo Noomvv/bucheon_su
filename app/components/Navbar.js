@@ -7,7 +7,8 @@ import {
   CalendarIcon,
   ChartBarIcon,
   LightBulbIcon,
-  UserIcon
+  UserIcon,
+  UserGroupIcon
 } from '@heroicons/react/24/outline';
 import styles from './Navbar.module.css';
 
@@ -19,8 +20,9 @@ export default function Navbar() {
   return (
     <nav className={styles.navbar}>
       <div className={styles.iconGrid}>
-        <Link href="/Events" className={`${styles.iconButton} ${isActive('/Events') ? styles.active : ''}`}>
-          <CalendarIcon className={styles.icon} />
+        <Link href="/Volunteering" className={`${styles.iconButton} ${isActive('/Volunteering') ? styles.active : ''}`}>
+          {/* <CalendarIcon className={styles.icon} /> */}
+          <UserGroupIcon className={styles.icon} />
         </Link>
         <Link href="/Polls" className={`${styles.iconButton} ${isActive('/Polls') ? styles.active : ''}`}>
           <ChartBarIcon className={styles.icon} />

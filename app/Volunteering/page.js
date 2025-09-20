@@ -151,7 +151,7 @@ export default function VolunteeringPage() {
         />
         <div className={styles.promoBlock}>
           <div className={styles.promoText}>
-            Участвуй в студенческих волонтёрских проектах, получай новый опыт и помогай другим.
+            Здесь показаны самые активные волонтёры — чем больше часов, тем выше место.
           </div>
         </div>
       </div>
