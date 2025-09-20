@@ -19,7 +19,7 @@ export default function Sidebar({ children }) {
       <div className={`${styles.sidebar} ${menuOpen ? styles.sidebarOpen : ''}`}>
         <nav className={styles.sidebarNav}>
           <a href="/Members" className={styles.sidebarLink}>Состав совета</a>
-          <a href="/public/su.pdf" className={styles.sidebarLink}>Положение</a>
+          <a href="/su.pdf" className={styles.sidebarLink}>Положение</a>
           <a href="/Events" className={styles.sidebarLink}>События</a>
         </nav>
       </div>
