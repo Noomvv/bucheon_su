@@ -303,11 +303,11 @@ export default function AuthForm({ onSuccess }) {
       </p>
 
       {mode === 'login' && (
-        <p className={styles.forgotText}>
+        <p className={styles.switchText}>
           Забыли пароль?
           <button
             onClick={() => switchMode('forgot')}
-            className={styles.forgotButton}
+            className={styles.switchButton}
           >
             Восстановить
           </button>

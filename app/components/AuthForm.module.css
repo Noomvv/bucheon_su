@@ -252,38 +252,3 @@
 }
 
 
-/* components/AuthForm.module.css */
-/* ... существующие стили ... */
-
-.forgotText {
-  text-align: center;
-  margin: 1rem 0;
-  color: #666;
-}
-
-.forgotButton {
-  background: none;
-  border: none;
-  color: #007bff;
-  text-decoration: underline;
-  cursor: pointer;
-  margin-left: 0.5rem;
-}
-
-.forgotButton:hover {
-  color: #0056b3;
-}
-
-.successMessage {
-  text-align: center;
-  padding: 2rem;
-  background: #d4edda;
-  border: 1px solid #c3e6cb;
-  border-radius: 8px;
-  color: #155724;
-  margin-bottom: 1rem;
-}
-
-.successMessage p {
-  margin: 0.5rem 0;
-}
