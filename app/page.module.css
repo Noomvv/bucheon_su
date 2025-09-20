@@ -172,3 +172,12 @@
     text-align: left; /* Выравниваем текст по левому краю */
   }
 }
+
+/* telegram */
+.telegram {
+  color: var(--border-color);
+  font-weight: 500;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+/* teleram end */

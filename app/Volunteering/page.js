@@ -94,15 +94,35 @@ export default function VolunteeringPage() {
     <div className={styles.container}>
       {/* Таблица волонтеров наверху */}
       <div className={styles.topContainer}>
-        <h2 className={styles.topTitle}>Рейтинг волонтеров</h2>
         
         {/* Статистика */}
         <div className={styles.statsContainer}>
           <div className={styles.statCard}>
             <div className={styles.statNumber}>{totalVolunteers}</div>
-            <div className={styles.statLabel}>Всего волонтеров</div>
+            <div className={styles.statLabel}>Всего участников</div>
           </div>
         </div>
+
+        {/* Промо блок и кнопка */}
+        <div className={styles.promoWrapper}>
+        <img
+          src="/images/promo3.png"
+          alt="Волонтерство"
+          className={styles.promoImageOverlap}
+        />
+        <div className={styles.promoBlock}>
+          <div className={styles.promoText}>
+            Здесь показаны самые активные волонтёры — чем больше часов, тем выше место.
+          </div>
+        </div>
+        </div>
+
+        <button 
+        className={styles.button}
+        onClick={handleBecomeVolunteer}
+        disabled={isLoading}>
+        {isLoading ? 'Загрузка...' : 'Хочу участвовать'}
+        </button>
 
         {topLoading ? (
           <div className={styles.loading}>Загрузка рейтинга волонтеров...</div>
@@ -142,27 +162,9 @@ export default function VolunteeringPage() {
         )}
       </div>
 
-      {/* Промо блок и кнопка */}
-      <div className={styles.promoWrapper}>
-        <img
-          src="/images/promo3.png"
-          alt="Волонтерство"
-          className={styles.promoImageOverlap}
-        />
-        <div className={styles.promoBlock}>
-          <div className={styles.promoText}>
-            Здесь показаны самые активные волонтёры — чем больше часов, тем выше место.
-          </div>
-        </div>
-      </div>
+      
 
-      <button 
-        className={styles.button}
-        onClick={handleBecomeVolunteer}
-        disabled={isLoading}
-      >
-        {isLoading ? 'Загрузка...' : 'Стать волонтёром'}
-      </button>
+      
     </div>
   )
 }
