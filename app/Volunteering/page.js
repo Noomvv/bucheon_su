@@ -99,7 +99,7 @@ export default function VolunteeringPage() {
         <div className={styles.statsContainer}>
           <div className={styles.statCard}>
             <div className={styles.statNumber}>{totalVolunteers}</div>
-            <div className={styles.statLabel}>Всего участников</div>
+            <div className={styles.statLabel}>Всего волонтеров</div>
           </div>
         </div>
 
