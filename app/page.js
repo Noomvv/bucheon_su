@@ -29,15 +29,7 @@ export default function StudentCouncil() {
     <div className={styles.wrapper}>
       <div className={styles.container}>
         {/* Новый блок с логотипом и названием */}
-        <section className={styles.logoSection}>
-          <div className={styles.logoContainer}>
-            <img src='/images/default.webp' className={styles.logoIcon} alt="Logo" />
-            <span className={styles.logoText}>Student Council</span>
-          </div>
-          <p className={styles.logoDescription}>
-            Команда студенческого совета
-          </p>
-        </section>
+        
 
         <header className={styles.header}>
           <div className={styles.chairmanContainer}>
@@ -53,8 +45,7 @@ export default function StudentCouncil() {
 
         <Alert>
           👋 Привет, первокурсники!
-Пока у нас нет базы с вашими данными, поэтому зарегистрироваться через систему не получится.
-Чтобы зарегистрироваться, напишите в Telegram 👉 <a href='https://t.me/v_v_moon' className={styles.telegram}>v_v_moon</a>
+          Пока у нас нет базы с вашими данными, поэтому зарегистрироваться через систему не получится.
         </Alert>
 
         <div className={styles.content}>
