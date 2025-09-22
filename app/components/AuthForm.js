@@ -1,14 +1,26 @@
 // components/AuthForm.js
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '../../lib/supabaseClient'
 import styles from './AuthForm.module.css'
 
+// Выносим функции валидации в отдельный файл или оставляем здесь
+function validateInitData(initData) {
+  // Заглушка - реализуйте вашу логику валидации
+  console.log('InitData validation:', initData);
+  return true;
+}
+
+function parseInitData(initData) {
+  // Заглушка - реализуйте вашу логику парсинга
+  return { id: 'test_id' };
+}
+
 export default function AuthForm({ onSuccess }) {
   const router = useRouter()
-  const [mode, setMode] = useState('login') // 'login' | 'register' | 'forgot'
+  const [mode, setMode] = useState('login')
   const [studentId, setStudentId] = useState('')
   const [login, setLogin] = useState('')
   const [password, setPassword] = useState('')
@@ -16,6 +28,35 @@ export default function AuthForm({ onSuccess }) {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [emailSent, setEmailSent] = useState(false)
+  const [telegramId, setTelegramId] = useState(null)
+  const [isTelegramWebApp, setIsTelegramWebApp] = useState(false)
+
+  const getTelegramId = async () => {
+    if (typeof window !== 'undefined' && window.Telegram?.WebApp) {
+      const initData = window.Telegram.WebApp.initData;
+      if (initData && validateInitData(initData)) {
+        const userData = parseInitData(initData);
+        return userData.id;
+      }
+    }
+    return null;
+  };
+
+  useEffect(() => {
+    const initTelegram = async () => {
+      if (typeof window !== 'undefined' && window.Telegram?.WebApp) {
+        setIsTelegramWebApp(true);
+        const tgId = await getTelegramId();
+        if (tgId) {
+          setTelegramId(tgId);
+        }
+        window.Telegram.WebApp.ready();
+        window.Telegram.WebApp.expand();
+      }
+    };
+
+    initTelegram();
+  }, []);
 
   const switchMode = (newMode) => {
     setError('')
@@ -50,6 +91,11 @@ export default function AuthForm({ onSuccess }) {
     e.preventDefault()
     setError('')
 
+    const telegramId = await getTelegramId();
+    if (!telegramId) {
+      return setError('Доступ только через Telegram бота')
+    }
+
     const idNum = parseInt(studentId.trim(), 10)
     if (isNaN(idNum)) {
       return setError('Неверный Student ID')
@@ -64,40 +110,67 @@ export default function AuthForm({ onSuccess }) {
     setLoading(true)
     
     try {
-      // Проверка студента
-      const { data: stud, error: e1 } = await supabase
+      // 1. Получаем контактные данные
+      const { data: pendingData, error: pendingError } = await supabase
+        .from('pending_registrations')
+        .select('*')
+        .eq('telegram_id', telegramId)
+        .gt('expires_at', new Date().toISOString())
+        .single()
+
+      if (pendingError || !pendingData) {
+        throw new Error('Контактные данные не найдены. Вернитесь в бота и отправьте контакт.')
+      }
+
+      // 2. Проверяем student_id
+      const { data: stud, error: studError } = await supabase
         .from('students')
-        .select('auth_user_id')
+        .select('auth_user_id, telegram_id')
         .eq('student_id', idNum)
         .single()
 
-      if (e1 || !stud) {
+      if (studError || !stud) {
         throw new Error('Студент не найден')
       }
       if (stud.auth_user_id) {
         throw new Error('Уже зарегистрирован')
       }
 
-      // Регистрация
+      // 3. Регистрация
+      const email = `${pendingData.phone_number}@campus.ru`;
+      const password = Math.random().toString(36).slice(-10);
+
       const { data: sd, error: e2 } = await supabase.auth.signUp({
-        email: login,
-        password
+        email: email,
+        password: password
       })
 
       if (e2) throw e2
 
-      // Привязка к students
+      // 4. Привязка к students
       const { error: e3 } = await supabase
         .from('students')
-        .update({ auth_user_id: sd.user.id, email: login })
+        .update({ 
+          auth_user_id: sd.user.id, 
+          email: email,
+          telegram_id: telegramId,
+          phone_number: pendingData.phone_number,
+          telegram_username: pendingData.username
+        })
         .eq('student_id', idNum)
 
       if (e3) throw e3
 
-      // Автологин
+      // 5. Удаляем временные данные
+      await supabase
+        .from('pending_registrations')
+        .delete()
+        .eq('telegram_id', telegramId)
+
+      // 6. Автологин
       const { error: e4 } = await supabase.auth.signInWithPassword({
-        email: login,
-        password
+        email: email,
+        password: password
       })
 
       if (e4) throw e4
@@ -188,17 +261,6 @@ export default function AuthForm({ onSuccess }) {
             </p>
           </form>
         )}
-
-        <div className={styles.promoWrapper}>
-          <img
-            src="/images/promo.png"
-            alt="Человек думает"
-            className={styles.promoImageOverlap}
-          />
-          <div className={styles.promoBlock}>
-            <div className={styles.promoText}>Все пароли шифруются с использованием bcrypt-хеширования.</div>
-          </div>
-        </div>
       </div>
     )
   }
@@ -313,17 +375,6 @@ export default function AuthForm({ onSuccess }) {
           </button>
         </p>
       )}
-
-      <div className={styles.promoWrapper}>
-        <img
-          src="/images/promo2.png"
-          alt="Человек думает"
-          className={styles.promoImageOverlap}
-        />
-        <div className={styles.promoBlock}>
-          <div className={styles.promoText}>Все пароли шифруются с использованием bcrypt-хеширования.</div>
-        </div>
-      </div>
     </div>
   )
 }
