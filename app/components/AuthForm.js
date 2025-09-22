@@ -316,7 +316,7 @@ export default function AuthForm({ onSuccess }) {
 
       <div className={styles.promoWrapper}>
         <img
-          src="/images/promo.png"
+          src="/images/promo2.png"
           alt="Человек думает"
           className={styles.promoImageOverlap}
         />

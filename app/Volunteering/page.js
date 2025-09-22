@@ -106,7 +106,7 @@ export default function VolunteeringPage() {
         {/* Промо блок и кнопка */}
         <div className={styles.promoWrapper}>
         <img
-          src="/images/promo3.png"
+          src="/images/promo4.png"
           alt="Волонтерство"
           className={styles.promoImageOverlap}
         />
