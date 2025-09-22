@@ -42,6 +42,7 @@ export default function AuthForm({ onSuccess }) {
           setTelegramId(user.id.toString());
           console.log('Telegram user from initDataUnsafe:', user);
           
+          // Автозаполнение email ТОЛЬКО если поле пустое
           if (user.username && !login) {
             setLogin(`${user.username}@telegram.user`);
           }
@@ -55,6 +56,11 @@ export default function AuthForm({ onSuccess }) {
               const userData = JSON.parse(decodeURIComponent(userParam));
               setTelegramId(userData.id.toString());
               console.log('Telegram user from initData:', userData);
+              
+              // Автозаполнение email ТОЛЬКО если поле пустое
+              if (userData.username && !login) {
+                setLogin(`${userData.username}@telegram.user`);
+              }
             }
           } catch (e) {
             console.error('Error parsing initData:', e);
@@ -79,7 +85,7 @@ export default function AuthForm({ onSuccess }) {
     };
 
     initTelegram();
-  }, [login]);
+  }, []); // Убираем login из зависимостей
 
   const switchMode = (newMode) => {
     setError('')
@@ -115,6 +121,7 @@ export default function AuthForm({ onSuccess }) {
     setError('')
 
     console.log('Current Telegram ID:', telegramId);
+    console.log('User entered email:', login);
     
     if (!telegramId) {
       return setError('❌ Доступ только через Telegram бота. Убедитесь, что открыли приложение через кнопку "🎓 Зарегистрироваться" в боте.')
@@ -123,6 +130,17 @@ export default function AuthForm({ onSuccess }) {
     const idNum = parseInt(studentId.trim(), 10)
     if (isNaN(idNum)) {
       return setError('❌ Неверный Student ID. Введите числовой идентификатор.')
+    }
+
+    // Проверяем, что пользователь ввел email, а не используем автоматический
+    if (!login || login.includes('@telegram.user') || login.includes('@campus.ru')) {
+      return setError('❌ Пожалуйста, введите ваш реальный email адрес в поле "Ваш email"')
+    }
+
+    // Проверяем, что email корректный
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(login)) {
+      return setError('❌ Пожалуйста, введите корректный email адрес')
     }
 
     if (password.length < 8 || !/\d/.test(password) || !/[A-Za-z]/.test(password)) {
@@ -162,7 +180,7 @@ export default function AuthForm({ onSuccess }) {
       // 2. Проверяем student_id
       const { data: stud, error: studError } = await supabase
         .from('students')
-        .select('auth_user_id, telegram_id, firstname, lastname')
+        .select('auth_user_id, telegram_id, firstname, lastname, email')
         .eq('student_id', idNum)
         .single()
 
@@ -197,15 +215,22 @@ export default function AuthForm({ onSuccess }) {
         throw new Error(`❌ Ваш Telegram уже привязан к студенту: ${existingTelegram.firstname} ${existingTelegram.lastname}`)
       }
 
-      // 4. Создаем пользователя
-      const email = pendingData.phone_number ? 
-        `${pendingData.phone_number.replace('+', '')}@campus.ru` : 
-        `tg${telegramId}@telegram.user`;
-      
-      console.log('Creating user with email:', email);
+      // 4. Проверяем, не занят ли email другим пользователем
+      const { data: existingEmail, error: emailError } = await supabase
+        .from('students')
+        .select('student_id, firstname, lastname')
+        .eq('email', login)
+        .single()
+
+      if (existingEmail) {
+        throw new Error(`❌ Этот email уже используется студентом: ${existingEmail.firstname} ${existingEmail.lastname}`)
+      }
+
+      // 5. Создаем пользователя с email, который ввел пользователь
+      console.log('Creating user with email:', login);
       
       const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: email,
+        email: login, // Используем email, который ввел пользователь
         password: password
       })
 
@@ -214,12 +239,12 @@ export default function AuthForm({ onSuccess }) {
         throw authError;
       }
 
-      // 5. Обновляем запись студента
+      // 6. Обновляем запись студента
       const { error: updateError } = await supabase
         .from('students')
         .update({ 
           auth_user_id: authData.user.id,
-          email: email,
+          email: login, // Используем email, который ввел пользователь
           telegram_id: telegramId,
           phone_number: pendingData.phone_number,
           telegram_username: pendingData.username,
@@ -233,15 +258,15 @@ export default function AuthForm({ onSuccess }) {
         throw updateError;
       }
 
-      // 6. Удаляем временные данные
+      // 7. Удаляем временные данные
       await supabase
         .from('pending_registrations')
         .delete()
         .eq('telegram_id', telegramId)
 
-      // 7. Автовход
+      // 8. Автовход
       const { error: loginError } = await supabase.auth.signInWithPassword({
-        email: email,
+        email: login, // Используем email, который ввел пользователь
         password: password
       })
 
@@ -252,7 +277,7 @@ export default function AuthForm({ onSuccess }) {
 
       console.log('Registration successful!');
       
-      // 8. Успешная регистрация
+      // 9. Успешная регистрация
       if (isTelegramWebApp && window.Telegram?.WebApp) {
         window.Telegram.WebApp.showAlert('✅ Регистрация успешно завершена!', () => {
           window.Telegram.WebApp.close();
