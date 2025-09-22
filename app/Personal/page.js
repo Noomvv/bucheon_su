@@ -1,208 +1,505 @@
-// app/Personal/page.js
+// components/AuthForm.js
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { supabase } from '../../lib/supabaseClient'
-import AuthForm from '../components/AuthForm'
-import LogoutButton from '../components/LogoutButton'
-import StatsPanel from '../components/StatsPanel'
-import NotificationsBell from '../components/NotificationsBell'
-import styles from './page.module.css'
+import styles from './AuthForm.module.css'
 
-const LIKE_THRESHOLD = 100
-
-export default function PersonalPage() {
-  const [sessionChecked, setSessionChecked] = useState(false)
-  const [session, setSession] = useState(null)
-  const [student, setStudent] = useState(null)
-  const [studentId, setStudentId] = useState(null)
-  const [stats, setStats] = useState({ 
-    ideasCount: 0, 
-    totalLikes: 0, 
-    volunteerHours: 0
-  })
-  const [notifications, setNotifications] = useState([])
+export default function AuthForm({ onSuccess }) {
+  const router = useRouter()
+  const [mode, setMode] = useState('login')
+  const [studentId, setStudentId] = useState('')
+  const [login, setLogin] = useState('')
+  const [password, setPassword] = useState('')
+  const [confirm, setConfirm] = useState('')
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [emailSent, setEmailSent] = useState(false)
+  const [telegramId, setTelegramId] = useState(null)
+  const [isTelegramWebApp, setIsTelegramWebApp] = useState(false)
 
   useEffect(() => {
-    let mounted = true
-
-    const handleSession = async (session) => {
-      if (!mounted) return
-      setSession(session)
-      setSessionChecked(true)
-
-      if (!session) {
-        setStudent(null)
-        setStudentId(null)
-        setStats({ ideasCount: 0, totalLikes: 0, volunteerHours: 0 })
-        setNotifications([])
-        return
+    const initTelegram = () => {
+      // Сначала проверяем параметры URL (для отладки)
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlTgId = urlParams.get('tg_user_id');
+      
+      if (urlTgId) {
+        setTelegramId(urlTgId);
+        setIsTelegramWebApp(true);
+        console.log('Telegram ID from URL:', urlTgId);
+        return;
       }
 
-      // Получаем полные данные студента включая Telegram
-      const { data: stud } = await supabase
-        .from('students')
+      // Затем проверяем Telegram Web App
+      if (typeof window !== 'undefined' && window.Telegram?.WebApp) {
+        setIsTelegramWebApp(true);
+        
+        // Способ 1: Через initDataUnsafe (самый надежный)
+        if (window.Telegram.WebApp.initDataUnsafe?.user) {
+          const user = window.Telegram.WebApp.initDataUnsafe.user;
+          setTelegramId(user.id.toString());
+          console.log('Telegram user from initDataUnsafe:', user);
+          
+          // Автозаполнение email ТОЛЬКО если поле пустое
+          if (user.username && !login) {
+            setLogin(`${user.username}@telegram.user`);
+          }
+        } 
+        // Способ 2: Парсим initData вручную
+        else if (window.Telegram.WebApp.initData) {
+          try {
+            const params = new URLSearchParams(window.Telegram.WebApp.initData);
+            const userParam = params.get('user');
+            if (userParam) {
+              const userData = JSON.parse(decodeURIComponent(userParam));
+              setTelegramId(userData.id.toString());
+              console.log('Telegram user from initData:', userData);
+              
+              // Автозаполнение email ТОЛЬКО если поле пустое
+              if (userData.username && !login) {
+                setLogin(`${userData.username}@telegram.user`);
+              }
+            }
+          } catch (e) {
+            console.error('Error parsing initData:', e);
+          }
+        }
+        
+        // Инициализируем Web App
+        window.Telegram.WebApp.ready();
+        window.Telegram.WebApp.expand();
+        
+        // Показываем кнопку назад
+        if (window.Telegram.WebApp.BackButton) {
+          window.Telegram.WebApp.BackButton.show();
+          window.Telegram.WebApp.BackButton.onClick(() => {
+            window.Telegram.WebApp.close();
+          });
+        }
+      } else {
+        console.warn('Not in Telegram Web App');
+        setError('❌ Для регистрации откройте приложение через кнопку в Telegram боте.');
+      }
+    };
+
+    initTelegram();
+  }, []); // Убираем login из зависимостей
+
+  const switchMode = (newMode) => {
+    setError('')
+    setLoading(false)
+    setEmailSent(false)
+    setMode(newMode)
+  }
+
+  const handleLogin = async e => {
+    e.preventDefault()
+    setError('')
+    setLoading(true)
+    
+    const { error } = await supabase.auth.signInWithPassword({
+      email: login,
+      password
+    })
+    
+    setLoading(false)
+    if (error) {
+      setError(error.message)
+    } else {
+      if (onSuccess) {
+        onSuccess()
+      } else {
+        router.push('/Personal')
+      }
+    }
+  }
+
+  const handleRegister = async e => {
+    e.preventDefault()
+    setError('')
+
+    console.log('Current Telegram ID:', telegramId);
+    console.log('User entered email:', login);
+    
+    if (!telegramId) {
+      return setError('❌ Доступ только через Telegram бота. Убедитесь, что открыли приложение через кнопку "🎓 Зарегистрироваться" в боте.')
+    }
+
+    const idNum = parseInt(studentId.trim(), 10)
+    if (isNaN(idNum)) {
+      return setError('❌ Неверный Student ID. Введите числовой идентификатор.')
+    }
+
+    // Проверяем, что пользователь ввел email, а не используем автоматический
+    if (!login || login.includes('@telegram.user') || login.includes('@campus.ru')) {
+      return setError('❌ Пожалуйста, введите ваш реальный email адрес в поле "Ваш email"')
+    }
+
+    // Проверяем, что email корректный
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(login)) {
+      return setError('❌ Пожалуйста, введите корректный email адрес')
+    }
+
+    if (password.length < 8 || !/\d/.test(password) || !/[A-Za-z]/.test(password)) {
+      return setError('❌ Пароль должен содержать не менее 8 символов, включая буквы и цифры')
+    }
+
+    if (password !== confirm) {
+      return setError('❌ Пароли не совпадают')
+    }
+
+    setLoading(true)
+    
+    try {
+      console.log('Checking pending registration for Telegram ID:', telegramId);
+      
+      // 1. Получаем контактные данные из pending_registrations
+      const { data: pendingData, error: pendingError } = await supabase
+        .from('pending_registrations')
         .select('*')
-        .eq('auth_user_id', session.user.id)
+        .eq('telegram_id', telegramId)
+        .gt('expires_at', new Date().toISOString())
         .single()
 
-      if (!mounted || !stud) return
+      if (pendingError) {
+        console.error('Pending registration error:', pendingError);
+        if (pendingError.code === 'PGRST116') {
+          throw new Error('❌ Контактные данные не найдены. Вернитесь в бота, отправьте контакт и откройте регистрацию заново.')
+        }
+      }
+
+      if (!pendingData) {
+        throw new Error('❌ Контактные данные не найдены или истекли. Вернитесь в бота и отправьте контакт повторно.')
+      }
+
+      console.log('Pending data found:', pendingData);
+
+      // 2. Проверяем student_id
+      const { data: stud, error: studError } = await supabase
+        .from('students')
+        .select('auth_user_id, telegram_id, firstname, lastname, email')
+        .eq('student_id', idNum)
+        .single()
+
+      if (studError) {
+        console.error('Student check error:', studError);
+        if (studError.code === 'PGRST116') {
+          throw new Error('❌ Студент с таким ID не найден в базе данных.')
+        }
+        throw new Error('❌ Ошибка при проверке Student ID.')
+      }
+
+      if (!stud) {
+        throw new Error('❌ Студент с таким ID не найден в базе данных.')
+      }
+
+      if (stud.auth_user_id) {
+        throw new Error('❌ Этот Student ID уже зарегистрирован в системе.')
+      }
+
+      if (stud.telegram_id && stud.telegram_id !== telegramId) {
+        throw new Error('❌ Этот Student ID уже привязан к другому Telegram аккаунту.')
+      }
+
+      // 3. Проверяем, не привязан ли уже этот Telegram к другому студенту
+      const { data: existingTelegram, error: tgError } = await supabase
+        .from('students')
+        .select('student_id, firstname, lastname')
+        .eq('telegram_id', telegramId)
+        .single()
+
+      if (existingTelegram && existingTelegram.student_id !== idNum) {
+        throw new Error(`❌ Ваш Telegram уже привязан к студенту: ${existingTelegram.firstname} ${existingTelegram.lastname}`)
+      }
+
+      // 4. Проверяем, не занят ли email другим пользователем
+      const { data: existingEmail, error: emailError } = await supabase
+        .from('students')
+        .select('student_id, firstname, lastname')
+        .eq('email', login)
+        .single()
+
+      if (existingEmail) {
+        throw new Error(`❌ Этот email уже используется студентом: ${existingEmail.firstname} ${existingEmail.lastname}`)
+      }
+
+      // 5. Создаем пользователя с email, который ввел пользователь
+      console.log('Creating user with email:', login);
       
-      setStudent({ 
-        firstname: stud.firstname, 
-        lastname: stud.lastname,
-        telegram_username: stud.telegram_username,
-        phone_number: stud.phone_number,
-        registration_date: stud.registration_date,
-        faculty: stud.faculty,
-        enrollment_year: stud.enrollment_year
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: login, // Используем email, который ввел пользователь
+        password: password
       })
-      setStudentId(stud.student_id)
 
-      // Загрузка статистики идей
-      const { data: ideas } = await supabase
-        .from('ideas')
-        .select('student_id, content, idea_votes(vote)')
-      
-      if (ideas) {
-        const likesMap = {}
-        ideas.forEach(i => {
-          const c = i.idea_votes.filter(v => v.vote === 1).length
-          likesMap[i.student_id] = (likesMap[i.student_id] || 0) + c
+      if (authError) {
+        console.error('Auth error:', authError);
+        throw authError;
+      }
+
+      // 6. Обновляем запись студента
+      const { error: updateError } = await supabase
+        .from('students')
+        .update({ 
+          auth_user_id: authData.user.id,
+          email: login, // Используем email, который ввел пользователь
+          telegram_id: telegramId,
+          phone_number: pendingData.phone_number,
+          telegram_username: pendingData.username,
+          registration_date: new Date().toISOString(),
+          is_active: true
         })
+        .eq('student_id', idNum)
 
-        const ideasCount = ideas.filter(i => i.student_id === stud.student_id).length
-        const totalLikes = likesMap[stud.student_id] || 0
-
-        // Загрузка часов волонтерства
-        const { data: volunteer } = await supabase
-          .from('volunteers')
-          .select('total_hours')
-          .eq('student_id', stud.student_id)
-          .single()
-
-        const volunteerHours = volunteer?.total_hours || 0
-
-        const notes = ideas
-          .filter(i => i.student_id === stud.student_id)
-          .filter(i => i.idea_votes.filter(v => v.vote === 1).length >= LIKE_THRESHOLD)
-          .map(i => `Ваша идея «${i.content}» набрала ${LIKE_THRESHOLD}+ лайков и отправлена на рассмотрение.`)
-
-        setStats({ ideasCount, totalLikes, volunteerHours })
-        setNotifications(notes)
+      if (updateError) {
+        console.error('Update error:', updateError);
+        throw updateError;
       }
+
+      // 7. Удаляем временные данные
+      await supabase
+        .from('pending_registrations')
+        .delete()
+        .eq('telegram_id', telegramId)
+
+      // 8. Автовход
+      const { error: loginError } = await supabase.auth.signInWithPassword({
+        email: login, // Используем email, который ввел пользователь
+        password: password
+      })
+
+      if (loginError) {
+        console.error('Login error:', loginError);
+        throw loginError;
+      }
+
+      console.log('Registration successful!');
+      
+      // 9. Успешная регистрация
+      if (isTelegramWebApp && window.Telegram?.WebApp) {
+        window.Telegram.WebApp.showAlert('✅ Регистрация успешно завершена!', () => {
+          window.Telegram.WebApp.close();
+        });
+      } else if (onSuccess) {
+        onSuccess();
+      } else {
+        router.push('/Personal');
+      }
+
+    } catch (err) {
+      console.error('Registration error:', err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const handleForgotPassword = async e => {
+    e.preventDefault()
+    setError('')
+    setLoading(true)
+
+    if (!login.trim()) {
+      setError('Введите email')
+      setLoading(false)
+      return
     }
 
-    supabase.auth.getSession().then(({ data }) => {
-      handleSession(data.session)
+    const { error } = await supabase.auth.resetPasswordForEmail(login, {
+      redirectTo: `${window.location.origin}/auth/update-password`,
     })
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        handleSession(session)
-      }
-    )
-
-    return () => {
-      mounted = false
-      subscription.unsubscribe()
+    setLoading(false)
+    if (error) {
+      setError(error.message)
+    } else {
+      setEmailSent(true)
     }
-  }, [])
+  }
 
-  if (!sessionChecked) return <div className={styles.loadingContainer}>Загрузка...</div>
+  if (mode === 'forgot') {
+    return (
+      <div className={styles.container}>
+        <h2 className={styles.title}>Восстановление пароля</h2>
 
-  if (!session) return (
-    <div className={styles.authContainer}>
-      <div className={styles.authCard}>
-        <AuthForm />
+        {emailSent ? (
+          <div className={styles.successMessage}>
+            <p>Письмо с инструкциями отправлено на {login}</p>
+            <p>Проверьте вашу почту и следуйте инструкциям</p>
+            <button
+              onClick={() => switchMode('login')}
+              className={styles.switchButton}
+            >
+              Вернуться к входу
+            </button>
+          </div>
+        ) : (
+          <form onSubmit={handleForgotPassword} className={styles.form}>
+            <label className={styles.label}>
+              Ваш email:
+              <input
+                type="email"
+                value={login}
+                onChange={e => setLogin(e.target.value)}
+                required
+                className={styles.input}
+                placeholder="Введите email для восстановления"
+              />
+            </label>
+
+            {error && <p className={styles.error}>{error}</p>}
+
+            <button
+              type="submit"
+              disabled={loading}
+              className={styles.submitButton}
+            >
+              {loading ? 'Отправка...' : 'Восстановить пароль'}
+            </button>
+
+            <p className={styles.switchText}>
+              Вспомнили пароль?
+              <button
+                onClick={() => switchMode('login')}
+                className={styles.switchButton}
+              >
+                Войти
+              </button>
+            </p>
+          </form>
+        )}
       </div>
-    </div>
-  )
-
-  if (!student) return <div className={styles.loadingContainer}>Загрузка данных студента...</div>
-
-  // Форматируем дату регистрации
-  const formatDate = (dateString) => {
-    if (!dateString) return ''
-    const date = new Date(dateString)
-    return date.toLocaleDateString('ru-RU', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric'
-    })
+    )
   }
 
   return (
-    <div className={styles.mainContainer}>
-      <div className={styles.contentContainer}>
-        {/* Header Block */}
-        <div className={styles.headerBlock}>
-          <div className={styles.headerContent}>
-            <h2 className={styles.greeting}>Добро пожаловать</h2>
-            <h1 className={styles.userName}>
-              {student.firstname} {student.lastname}
-            </h1>
-            
-            {/* Telegram информация */}
-            <div className={styles.contactInfo}>
-              {student.telegram_username && (
-                <p className={styles.contactItem}>
-                  <span className={styles.contactIcon}>📱</span>
-                  @{student.telegram_username}
-                </p>
-              )}
-              
-              {student.phone_number && (
-                <p className={styles.contactItem}>
-                  <span className={styles.contactIcon}>📞</span>
-                  {student.phone_number}
-                </p>
-              )}
-              
-              {student.faculty && (
-                <p className={styles.contactItem}>
-                  <span className={styles.contactIcon}>🎓</span>
-                  {student.faculty}
-                  {student.enrollment_year && `, ${student.enrollment_year} год`}
-                </p>
-              )}
-              
-              {student.registration_date && (
-                <p className={styles.contactItem}>
-                  <span className={styles.contactIcon}>📅</span>
-                  Зарегистрирован: {formatDate(student.registration_date)}
-                </p>
-              )}
-            </div>
-          </div>
-          <div className={styles.notificationsWrapper}>
-            <NotificationsBell notifications={notifications} />
-          </div>
+    <div className={styles.container}>
+      {/* Отладочная информация */}
+      {telegramId && (
+        <div style={{ 
+          background: '#e3f2fd', 
+          padding: '10px', 
+          borderRadius: '5px', 
+          marginBottom: '15px',
+          fontSize: '14px',
+          border: '1px solid #90caf9'
+        }}>
+          <strong>Отладочная информация:</strong><br />
+          Telegram ID: {telegramId}<br />
+          Режим: {isTelegramWebApp ? 'Telegram Web App' : 'Обычный браузер'}
         </div>
+      )}
 
-        {/* Stats Block */}
-        <StatsPanel
-          ideasCount={stats.ideasCount}
-          totalLikes={stats.totalLikes}
-          volunteerHours={stats.volunteerHours}
-        />
+      <h2 className={styles.title}>
+        {mode === 'login' ? 'Вход в систему' : 'Регистрация'}
+      </h2>
 
-        {/* Top Message Block */}
-        {stats.volunteerHours > 0 && (
-          <div className={styles.topMessageBlock}>
-            <div className={styles.topMessageContent}>
-              {stats.volunteerHours >= 50 ? '🏆 Вы активный волонтер!' : 
-               stats.volunteerHours >= 20 ? '👍 Спасибо за вашу помощь!' :
-               '🌟 Вы начинающий волонтер!'}
-            </div>
-          </div>
+      <form
+        onSubmit={mode === 'login' ? handleLogin : handleRegister}
+        className={styles.form}
+      >
+        {mode === 'register' && (
+          <>
+            <label className={styles.label}>
+              Student ID:
+              <input
+                type="text"
+                value={studentId}
+                onChange={e => setStudentId(e.target.value)}
+                required
+                className={styles.input}
+                placeholder="Введите ваш Student ID"
+              />
+            </label>
+          </>
         )}
 
-        {/* Logout Block */}
-        <div className={styles.logoutBlock}>
-          <LogoutButton />
-        </div>
-      </div>
+        <label className={styles.label}>
+          Ваш email:
+          <input
+            type="email"
+            value={login}
+            onChange={e => setLogin(e.target.value)}
+            required
+            className={styles.input}
+            placeholder="example@email.com"
+          />
+        </label>
+
+        <label className={styles.label}>
+          Пароль:
+          <input
+            type="password"
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+            required
+            className={styles.input}
+            placeholder="Не менее 8 символов"
+          />
+        </label>
+
+        {mode === 'register' && (
+          <label className={styles.label}>
+            Подтвердите пароль:
+            <input
+              type="password"
+              value={confirm}
+              onChange={e => setConfirm(e.target.value)}
+              required
+              className={styles.input}
+              placeholder="Повторите пароль"
+            />
+          </label>
+        )}
+
+        {error && <p className={styles.error}>{error}</p>}
+
+        <button
+          type="submit"
+          disabled={loading}
+          className={styles.submitButton}
+        >
+          {loading ? '...' : mode === 'login' ? 'Войти' : 'Зарегистрироваться'}
+        </button>
+      </form>
+
+      <p className={styles.switchText}>
+        {mode === 'login' ? (
+          <>
+            Нет аккаунта?
+            <button
+              onClick={() => switchMode('register')}
+              className={styles.switchButton}
+            >
+              Регистрация
+            </button>
+          </>
+        ) : (
+          <>
+            Есть аккаунт?
+            <button
+              onClick={() => switchMode('login')}
+              className={styles.switchButton}
+            >
+              Вход
+            </button>
+          </>
+        )}
+      </p>
+
+      {mode === 'login' && (
+        <p className={styles.switchText}>
+          Забыли пароль?
+          <button
+            onClick={() => switchMode('forgot')}
+            className={styles.switchButton}
+          >
+            Восстановить
+          </button>
+        </p>
+      )}
     </div>
   )
 }
