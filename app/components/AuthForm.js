@@ -6,18 +6,6 @@ import { useRouter } from 'next/navigation'
 import { supabase } from '../../lib/supabaseClient'
 import styles from './AuthForm.module.css'
 
-// Выносим функции валидации в отдельный файл или оставляем здесь
-function validateInitData(initData) {
-  // Заглушка - реализуйте вашу логику валидации
-  console.log('InitData validation:', initData);
-  return true;
-}
-
-function parseInitData(initData) {
-  // Заглушка - реализуйте вашу логику парсинга
-  return { id: 'test_id' };
-}
-
 export default function AuthForm({ onSuccess }) {
   const router = useRouter()
   const [mode, setMode] = useState('login')
@@ -31,32 +19,67 @@ export default function AuthForm({ onSuccess }) {
   const [telegramId, setTelegramId] = useState(null)
   const [isTelegramWebApp, setIsTelegramWebApp] = useState(false)
 
-  const getTelegramId = async () => {
-    if (typeof window !== 'undefined' && window.Telegram?.WebApp) {
-      const initData = window.Telegram.WebApp.initData;
-      if (initData && validateInitData(initData)) {
-        const userData = parseInitData(initData);
-        return userData.id;
-      }
-    }
-    return null;
-  };
-
   useEffect(() => {
-    const initTelegram = async () => {
+    const initTelegram = () => {
+      // Сначала проверяем параметры URL (для отладки)
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlTgId = urlParams.get('tg_user_id');
+      
+      if (urlTgId) {
+        setTelegramId(urlTgId);
+        setIsTelegramWebApp(true);
+        console.log('Telegram ID from URL:', urlTgId);
+        return;
+      }
+
+      // Затем проверяем Telegram Web App
       if (typeof window !== 'undefined' && window.Telegram?.WebApp) {
         setIsTelegramWebApp(true);
-        const tgId = await getTelegramId();
-        if (tgId) {
-          setTelegramId(tgId);
+        
+        // Способ 1: Через initDataUnsafe (самый надежный)
+        if (window.Telegram.WebApp.initDataUnsafe?.user) {
+          const user = window.Telegram.WebApp.initDataUnsafe.user;
+          setTelegramId(user.id.toString());
+          console.log('Telegram user from initDataUnsafe:', user);
+          
+          if (user.username && !login) {
+            setLogin(`${user.username}@telegram.user`);
+          }
+        } 
+        // Способ 2: Парсим initData вручную
+        else if (window.Telegram.WebApp.initData) {
+          try {
+            const params = new URLSearchParams(window.Telegram.WebApp.initData);
+            const userParam = params.get('user');
+            if (userParam) {
+              const userData = JSON.parse(decodeURIComponent(userParam));
+              setTelegramId(userData.id.toString());
+              console.log('Telegram user from initData:', userData);
+            }
+          } catch (e) {
+            console.error('Error parsing initData:', e);
+          }
         }
+        
+        // Инициализируем Web App
         window.Telegram.WebApp.ready();
         window.Telegram.WebApp.expand();
+        
+        // Показываем кнопку назад
+        if (window.Telegram.WebApp.BackButton) {
+          window.Telegram.WebApp.BackButton.show();
+          window.Telegram.WebApp.BackButton.onClick(() => {
+            window.Telegram.WebApp.close();
+          });
+        }
+      } else {
+        console.warn('Not in Telegram Web App');
+        setError('❌ Для регистрации откройте приложение через кнопку в Telegram боте.');
       }
     };
 
     initTelegram();
-  }, []);
+  }, [login]);
 
   const switchMode = (newMode) => {
     setError('')
@@ -91,26 +114,31 @@ export default function AuthForm({ onSuccess }) {
     e.preventDefault()
     setError('')
 
-    const telegramId = await getTelegramId();
+    console.log('Current Telegram ID:', telegramId);
+    
     if (!telegramId) {
-      return setError('Доступ только через Telegram бота')
+      return setError('❌ Доступ только через Telegram бота. Убедитесь, что открыли приложение через кнопку "🎓 Зарегистрироваться" в боте.')
     }
 
     const idNum = parseInt(studentId.trim(), 10)
     if (isNaN(idNum)) {
-      return setError('Неверный Student ID')
+      return setError('❌ Неверный Student ID. Введите числовой идентификатор.')
     }
+
     if (password.length < 8 || !/\d/.test(password) || !/[A-Za-z]/.test(password)) {
-      return setError('Пароль ≥8 символов, буквы и цифры')
+      return setError('❌ Пароль должен содержать не менее 8 символов, включая буквы и цифры')
     }
+
     if (password !== confirm) {
-      return setError('Пароли не совпадают')
+      return setError('❌ Пароли не совпадают')
     }
 
     setLoading(true)
     
     try {
-      // 1. Получаем контактные данные
+      console.log('Checking pending registration for Telegram ID:', telegramId);
+      
+      // 1. Получаем контактные данные из pending_registrations
       const { data: pendingData, error: pendingError } = await supabase
         .from('pending_registrations')
         .select('*')
@@ -118,72 +146,128 @@ export default function AuthForm({ onSuccess }) {
         .gt('expires_at', new Date().toISOString())
         .single()
 
-      if (pendingError || !pendingData) {
-        throw new Error('Контактные данные не найдены. Вернитесь в бота и отправьте контакт.')
+      if (pendingError) {
+        console.error('Pending registration error:', pendingError);
+        if (pendingError.code === 'PGRST116') {
+          throw new Error('❌ Контактные данные не найдены. Вернитесь в бота, отправьте контакт и откройте регистрацию заново.')
+        }
       }
+
+      if (!pendingData) {
+        throw new Error('❌ Контактные данные не найдены или истекли. Вернитесь в бота и отправьте контакт повторно.')
+      }
+
+      console.log('Pending data found:', pendingData);
 
       // 2. Проверяем student_id
       const { data: stud, error: studError } = await supabase
         .from('students')
-        .select('auth_user_id, telegram_id')
+        .select('auth_user_id, telegram_id, firstname, lastname')
         .eq('student_id', idNum)
         .single()
 
-      if (studError || !stud) {
-        throw new Error('Студент не найден')
+      if (studError) {
+        console.error('Student check error:', studError);
+        if (studError.code === 'PGRST116') {
+          throw new Error('❌ Студент с таким ID не найден в базе данных.')
+        }
+        throw new Error('❌ Ошибка при проверке Student ID.')
       }
+
+      if (!stud) {
+        throw new Error('❌ Студент с таким ID не найден в базе данных.')
+      }
+
       if (stud.auth_user_id) {
-        throw new Error('Уже зарегистрирован')
+        throw new Error('❌ Этот Student ID уже зарегистрирован в системе.')
       }
 
-      // 3. Регистрация
-      const email = `${pendingData.phone_number}@campus.ru`;
-      const password = Math.random().toString(36).slice(-10);
+      if (stud.telegram_id && stud.telegram_id !== telegramId) {
+        throw new Error('❌ Этот Student ID уже привязан к другому Telegram аккаунту.')
+      }
 
-      const { data: sd, error: e2 } = await supabase.auth.signUp({
+      // 3. Проверяем, не привязан ли уже этот Telegram к другому студенту
+      const { data: existingTelegram, error: tgError } = await supabase
+        .from('students')
+        .select('student_id, firstname, lastname')
+        .eq('telegram_id', telegramId)
+        .single()
+
+      if (existingTelegram && existingTelegram.student_id !== idNum) {
+        throw new Error(`❌ Ваш Telegram уже привязан к студенту: ${existingTelegram.firstname} ${existingTelegram.lastname}`)
+      }
+
+      // 4. Создаем пользователя
+      const email = pendingData.phone_number ? 
+        `${pendingData.phone_number.replace('+', '')}@campus.ru` : 
+        `tg${telegramId}@telegram.user`;
+      
+      console.log('Creating user with email:', email);
+      
+      const { data: authData, error: authError } = await supabase.auth.signUp({
         email: email,
         password: password
       })
 
-      if (e2) throw e2
+      if (authError) {
+        console.error('Auth error:', authError);
+        throw authError;
+      }
 
-      // 4. Привязка к students
-      const { error: e3 } = await supabase
+      // 5. Обновляем запись студента
+      const { error: updateError } = await supabase
         .from('students')
         .update({ 
-          auth_user_id: sd.user.id, 
+          auth_user_id: authData.user.id,
           email: email,
           telegram_id: telegramId,
           phone_number: pendingData.phone_number,
-          telegram_username: pendingData.username
+          telegram_username: pendingData.username,
+          registration_date: new Date().toISOString(),
+          is_active: true
         })
         .eq('student_id', idNum)
 
-      if (e3) throw e3
+      if (updateError) {
+        console.error('Update error:', updateError);
+        throw updateError;
+      }
 
-      // 5. Удаляем временные данные
+      // 6. Удаляем временные данные
       await supabase
         .from('pending_registrations')
         .delete()
         .eq('telegram_id', telegramId)
 
-      // 6. Автологин
-      const { error: e4 } = await supabase.auth.signInWithPassword({
+      // 7. Автовход
+      const { error: loginError } = await supabase.auth.signInWithPassword({
         email: email,
         password: password
       })
 
-      if (e4) throw e4
-
-      if (onSuccess) {
-        onSuccess()
-      } else {
-        router.push('/Personal')
+      if (loginError) {
+        console.error('Login error:', loginError);
+        throw loginError;
       }
+
+      console.log('Registration successful!');
+      
+      // 8. Успешная регистрация
+      if (isTelegramWebApp && window.Telegram?.WebApp) {
+        window.Telegram.WebApp.showAlert('✅ Регистрация успешно завершена!', () => {
+          window.Telegram.WebApp.close();
+        });
+      } else if (onSuccess) {
+        onSuccess();
+      } else {
+        router.push('/Personal');
+      }
+
     } catch (err) {
-      setError(err.message)
+      console.error('Registration error:', err);
+      setError(err.message);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 
@@ -267,6 +351,22 @@ export default function AuthForm({ onSuccess }) {
 
   return (
     <div className={styles.container}>
+      {/* Отладочная информация */}
+      {telegramId && (
+        <div style={{ 
+          background: '#e3f2fd', 
+          padding: '10px', 
+          borderRadius: '5px', 
+          marginBottom: '15px',
+          fontSize: '14px',
+          border: '1px solid #90caf9'
+        }}>
+          <strong>Отладочная информация:</strong><br />
+          Telegram ID: {telegramId}<br />
+          Режим: {isTelegramWebApp ? 'Telegram Web App' : 'Обычный браузер'}
+        </div>
+      )}
+
       <h2 className={styles.title}>
         {mode === 'login' ? 'Вход в систему' : 'Регистрация'}
       </h2>

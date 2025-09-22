@@ -251,4 +251,17 @@
   }
 }
 
+/* AuthForm.module.css */
+.telegramInfo {
+  background: #e3f2fd;
+  border: 1px solid #90caf9;
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 15px;
+  font-size: 14px;
+}
 
+.telegramInfo h3 {
+  margin: 0 0 8px 0;
+  color: #1976d2;
+}
