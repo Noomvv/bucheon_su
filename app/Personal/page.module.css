@@ -148,3 +148,26 @@
     padding: 0.75rem;
   }
 }
+
+/* app/Personal/page.module.css */
+.contactInfo {
+  margin-top: 15px;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 10px;
+  border-left: 4px solid #007bff;
+}
+
+.contactItem {
+  margin: 8px 0;
+  font-size: 14px;
+  color: #555;
+  display: flex;
+  align-items: center;
+}
+
+.contactIcon {
+  margin-right: 10px;
+  font-size: 16px;
+  min-width: 20px;
+}
