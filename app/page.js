@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import styles from './page.module.css'
 import Alert from './components/Alert'
+import MemberCard from './components/MemberCard'
 import {
   AcademicCapIcon,
   UserIcon,
@@ -18,6 +19,17 @@ import {
 export default function StudentCouncil() {
   const [openBlocks, setOpenBlocks] = useState({}) // Управление видимостью блоков
 
+  // Данные президента
+  const chairman = {
+    id: 100,
+    firstName: "Руслан",
+    lastName: "Кустиков",
+    faculty: "Президент студенческого совета",
+    year: 2,
+    telegram: "zuz_zyy",
+    photoUrl: "/member-img/default.jpeg"
+  }
+
   const toggleBlock = (block) => {
     setOpenBlocks((prev) => ({
       ...prev,
@@ -28,20 +40,10 @@ export default function StudentCouncil() {
   return (
     <div className={styles.wrapper}>
       <div className={styles.container}>
-        {/* Новый блок с логотипом и названием */}
-        
-
-        <header className={styles.header}>
-          <div className={styles.chairmanContainer}>
-            <div className={styles.chairmanPhoto}>
-              <img src='/member-img/default.jpeg' className={styles.photoIcon} alt="Chairman Photo" />
-            </div>
-            <p className={styles.chairman}>
-              Президент совета: <br />
-              Кустиков Руслан
-            </p>
-          </div>
-        </header>
+        {/* Заменённый блок президента */}
+        <div style={{ width: '95%' }}>
+          <MemberCard student={chairman} />
+        </div>
 
         <Alert>
           Привет, первокурсники!
