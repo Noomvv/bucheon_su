@@ -199,9 +199,9 @@ export default function PersonalPage() {
         )}
 
         {/* Logout Block */}
-        <div className={styles.logoutBlock}>
+        {/* <div className={styles.logoutBlock}>
           <LogoutButton />
-        </div>
+        </div> */}
       </div>
     </div>
   )
