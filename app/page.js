@@ -40,8 +40,10 @@ export default function StudentCouncil() {
   return (
     <div className={styles.wrapper}>
       <div className={styles.container}>
-        {/* Заменённый блок президента */}
-        <div style={{ width: '95%' }}>
+        {/* Центрированный блок президента */}
+        <div
+          className={styles.chairmanBlock}
+        >
           <MemberCard student={chairman} />
         </div>
 

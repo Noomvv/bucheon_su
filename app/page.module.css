@@ -126,6 +126,27 @@
   margin-top: 2px;
 }
 
+.chairmanBlock {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+}
+
+/* Для увеличения фото в карточке президента */
+.card .photoContainer {
+  width: 90px;
+  height: 90px;
+  border-radius: 16px;
+}
+
+.card .photoIcon {
+  width: 100%;
+  height: 100%;
+  border-radius: 16px;
+}
+
 @media (max-width: 768px) {
   .header {
     flex-direction: column;
