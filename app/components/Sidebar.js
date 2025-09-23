@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import styles from './Sidebar.module.css';
+import LogoutButton from './LogoutButton';
 
 export default function Sidebar({ children }) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -21,6 +22,7 @@ export default function Sidebar({ children }) {
           <a href="/Members" className={styles.sidebarLink}>Состав совета</a>
           <a href="/su.pdf" className={styles.sidebarLink}>Положение</a>
           <a href="/Events" className={styles.sidebarLink}>События</a>
+          <LogoutButton />
         </nav>
       </div>
     </>
