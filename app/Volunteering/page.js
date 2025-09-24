@@ -117,12 +117,14 @@ export default function VolunteeringPage() {
         </div>
         </div>
 
-        <button 
-        className={styles.button}
-        onClick={handleBecomeVolunteer}
-        disabled={isLoading}>
-        {isLoading ? 'Загрузка...' : 'Хочу участвовать'}
-        </button>
+        <div className={styles.buttonContainer}>
+          <button 
+          className={styles.button}
+          onClick={handleBecomeVolunteer}
+          disabled={isLoading}>
+          {isLoading ? 'Загрузка...' : 'Хочу участвовать'}
+          </button>
+        </div>
 
         {topLoading ? (
           <div className={styles.loading}>Загрузка рейтинга волонтеров...</div>

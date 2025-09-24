@@ -102,20 +102,24 @@
 
 .buttonContainer {
   width: 100%;
+  display: flex;
+  justify-content: center; /* Центрирует кнопку внутри контейнера */
 }
 
 .submitButton {
-  width: 100%;
+  width: 50%;
   padding: 1rem;
   background: var(--main-color);
   color: white;
   border: none;
-  border-radius: 12px;
+  border-radius: 60px;
   font-size: 1rem;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
-  
+  display: flex;
+  align-items: center;
+  justify-content: center; /* Центрирует текст внутри кнопки */
 }
 
 .submitButton:hover {

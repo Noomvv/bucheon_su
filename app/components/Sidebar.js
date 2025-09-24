@@ -17,6 +17,12 @@ export default function Sidebar({ children }) {
       <button className={styles.menuButton} onClick={toggleMenu}>
         ☰
       </button>
+      {menuOpen && (
+        <div
+          className={styles.overlay}
+          onClick={() => setMenuOpen(false)}
+        />
+      )}
       <div className={`${styles.sidebar} ${menuOpen ? styles.sidebarOpen : ''}`}>
         <nav className={styles.sidebarNav}>
           <a href="/Members" className={styles.sidebarLink}>Состав совета</a>

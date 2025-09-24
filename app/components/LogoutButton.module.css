@@ -14,7 +14,8 @@
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   line-height: 1;
-  margin-top: 1rem;
+  margin-top: auto; /* Важно! */
+  margin-bottom: 60%; /* Поднимает кнопку на 32px выше н
   text-align: center; /* Центрирует текст внутри кнопки */
 }
 
