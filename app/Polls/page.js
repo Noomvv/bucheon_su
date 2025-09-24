@@ -41,13 +41,13 @@ export default function PollsPage() {
             </div>
         </div>
 
-        {!isAdmin ? (
+        {/* {!isAdmin ? (
           <button onClick={handleAdminAccess} className={styles.button}>
             Добавить
           </button>
         ) : (
           <PollCreationForm onCreated={handleCreated} />
-        )}
+        )} */}
       </div>
 
       
