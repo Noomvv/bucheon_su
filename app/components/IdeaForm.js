@@ -1,6 +1,8 @@
+// app/components/IdeaForm.js
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 import { supabase } from '../../lib/supabaseClient'
 import Link from 'next/link'
 import styles from './IdeaForm.module.css'
@@ -15,13 +17,14 @@ const STATIC_CATEGORIES = [
 ]
 
 export default function IdeaForm({ onSuccess }) {
+  const queryClient = useQueryClient()
   const [studentId, setStudentId] = useState(null)
   const [dbCategories, setDbCategories] = useState([])
   const [category, setCategory] = useState('')
   const [content, setContent] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const [formVisible, setFormVisible] = useState(false) // Управление видимостью формы
+  const [formVisible, setFormVisible] = useState(false)
 
   // Получаем student_id текущего пользователя
   useEffect(() => {
@@ -82,7 +85,12 @@ export default function IdeaForm({ onSuccess }) {
       
       setContent('')
       setCategory('')
-      setFormVisible(false) // Скрываем форму после успешной отправки
+      setFormVisible(false)
+      
+      // Инвалидируем кэш идей чтобы обновить список
+      queryClient.invalidateQueries({ queryKey: ['ideas'] })
+      queryClient.invalidateQueries({ queryKey: ['ideaCategories'] })
+      
       onSuccess?.()
     } catch (err) {
       setError(err.message)
@@ -112,7 +120,7 @@ export default function IdeaForm({ onSuccess }) {
       {!formVisible ? (
         <div className={styles.buttonContainer}>
           <button
-            onClick={() => setFormVisible(true)} // Показываем форму при нажатии
+            onClick={() => setFormVisible(true)}
             className={styles.submitButton}
           >
             Опубликовать идею
@@ -170,6 +178,14 @@ export default function IdeaForm({ onSuccess }) {
                 <span className={styles.buttonText}>Опубликовать идею</span>
               )}
             </button>
+            {/* <button
+              type="button"
+              onClick={() => setFormVisible(false)}
+              className={styles.cancelButton}
+              disabled={loading}
+            >
+              Отмена
+            </button> */}
           </div>
         </form>
       )}
