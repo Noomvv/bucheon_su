@@ -116,7 +116,7 @@ export default function IdeaForm({ onSuccess }) {
       <div className={styles.outerContainer}>
         <div className={styles.buttonContainer}>
           <button className={styles.submitButton} disabled>
-            Загрузка...
+            Опубликовать идею
           </button>
         </div>
       </div>
