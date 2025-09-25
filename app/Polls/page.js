@@ -1,3 +1,4 @@
+// app/page.js
 'use client'
 
 import { useState } from 'react'
@@ -9,7 +10,6 @@ import styles from './page.module.css'
 const ADMIN_SECRET = 'Софочка'
 
 export default function PollsPage() {
-  const [pollVersion, setPollVersion] = useState(0)
   const [isAdmin, setIsAdmin] = useState(false)
 
   const handleAdminAccess = () => {
@@ -22,23 +22,26 @@ export default function PollsPage() {
   }
 
   const handleCreated = () => {
-    setPollVersion(v => v + 1)
+    // Теперь опросы автоматически обновятся через React Query
     setIsAdmin(false)
   }
 
   return (
     <div className={styles.container}>
       <div className={styles.content}>
-        <PollList key={pollVersion} />
+        <PollList /> {/* Убрали key={pollVersion} */}
 
         <div className={styles.promoWrapper}>
-            <img
-            src="/images/promo.png" // Указан правильный путь к изображению
+          <img
+            src="/images/promo.png"
             alt="Человек думает"
-            className={styles.promoImageOverlap}/>
-            <div className={styles.promoBlock}>
-                <div className={styles.promoText}>Опросы от студсовета — голосуй с реакциями и делись мнением в комментариях.</div>
+            className={styles.promoImageOverlap}
+          />
+          <div className={styles.promoBlock}>
+            <div className={styles.promoText}>
+              Опросы от студсовета — голосуй с реакциями и делись мнением в комментариях.
             </div>
+          </div>
         </div>
 
         {/* {!isAdmin ? (
@@ -49,8 +52,6 @@ export default function PollsPage() {
           <PollCreationForm onCreated={handleCreated} />
         )} */}
       </div>
-
-      
     </div>
   )
 }

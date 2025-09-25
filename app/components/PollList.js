@@ -1,31 +1,14 @@
 // app/components/PollList.js
 'use client'
 
-import { useState, useEffect } from 'react'
-import { supabase } from '../../lib/supabaseClient'
+import { usePolls } from '../hooks/usePolls'
 import PollCard from './PollCard'
 import styles from './PollList.module.css'
 
 export default function PollList() {
-  const [polls, setPolls] = useState([])
-  const [loading, setLoading] = useState(true)
+  const { data: polls, isLoading, error } = usePolls()
 
-  useEffect(() => {
-    fetchPolls()
-  }, [])
-
-  async function fetchPolls() {
-    setLoading(true)
-    const { data, error } = await supabase
-      .from('polls')
-      .select('id, question, created_at')
-      .order('created_at', { ascending: false })
-    
-    if (!error) setPolls(data)
-    setLoading(false)
-  }
-
-  if (loading) {
+  if (isLoading) {
     return (
       <div className={styles.listContainer}>
         {Array.from({ length: 5 }).map((_, index) => (
@@ -38,7 +21,16 @@ export default function PollList() {
     )
   }
 
-  if (polls.length === 0) {
+  if (error) {
+    console.error('Error loading polls:', error)
+    return (
+      <div className={styles.emptyState}>
+        Ошибка загрузки опросов
+      </div>
+    )
+  }
+
+  if (!polls || polls.length === 0) {
     return (
       <div className={styles.emptyState}>
         Пока нет ни одного опроса

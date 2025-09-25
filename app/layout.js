@@ -1,9 +1,11 @@
+// app/layout.js
 import { Montserrat } from "next/font/google";
 import "./globals.css";
 import Navbar from "./components/Navbar";
 import Header from "./components/Header";
 import Sidebar from './components/Sidebar';
 import SwipeWrapper from './components/SwipeWrapper';
+import { Providers } from './providers'; // Импорт провайдеров
 
 const montserrat = Montserrat({
   variable: "--font-montserrat",
@@ -19,13 +21,15 @@ export default function RootLayout({ children }) {
   return (
     <html lang="ru">
       <body className={montserrat.variable}>
-        <Sidebar>
-          <Header />
-          <SwipeWrapper>
-            {children}
-          </SwipeWrapper>
-        </Sidebar>
-        <Navbar />
+        <Providers> {/* Оберните всё в Providers */}
+          <Sidebar>
+            <Header />
+            <SwipeWrapper>
+              {children}
+            </SwipeWrapper>
+          </Sidebar>
+          <Navbar />
+        </Providers>
       </body>
     </html>
   );
