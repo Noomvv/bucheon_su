@@ -211,8 +211,8 @@ export default function IdeaList() {
         <div key={idea.id} className={styles.card}>
           <p className={styles.content}>{idea.content}</p>
           <p className={styles.metaText}>
-            <strong>Категория:</strong> {idea.category || 'Без категории'}<br />
-            <strong>Автор:</strong> {idea.students.firstname} {idea.students.lastname}, {idea.students.faculty}
+            Категория: {idea.category || 'Без категории'}<br />
+            Автор: {idea.students.firstname} {idea.students.lastname}, {idea.students.faculty}
           </p>
           <div className={styles.voteButtons}>
             <button
