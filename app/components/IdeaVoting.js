@@ -6,12 +6,12 @@ import { supabase } from '../../lib/supabaseClient'
 import { HandThumbUpIcon, HandThumbDownIcon } from '@heroicons/react/24/outline'
 import styles from './IdeaList.module.css'
 
-export default function IdeaVoting({ ideaId, initialLikes = 0, initialDislikes = 0, initialMyVote = 0 }) {
+export default function IdeaVoting({ ideaId }) {
   const STORAGE_KEY = `ideaVotes-${ideaId}`
 
-  const [likes, setLikes] = useState(initialLikes)
-  const [dislikes, setDislikes] = useState(initialDislikes)
-  const [myVote, setMyVote] = useState(initialMyVote)
+  const [likes, setLikes] = useState(0)
+  const [dislikes, setDislikes] = useState(0)
+  const [myVote, setMyVote] = useState(0)
   const [loading, setLoading] = useState(true)
 
   // Helper to persist to sessionStorage
