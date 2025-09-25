@@ -1,55 +1,79 @@
 // app/components/IdeaList.js
 'use client'
 
-import { useState } from 'react'
-import { useIdeas, useCategories } from '../hooks/useIdeas'
-import { useIdeaVoting } from '../hooks/useIdeaVoting'
-import { HandThumbUpIcon, HandThumbDownIcon } from '@heroicons/react/24/outline'
+import { useState, useEffect } from 'react'
+import { supabase } from '../../lib/supabaseClient'
+import IdeaVoting from './IdeaVoting'
 import styles from './IdeaList.module.css'
 
+const STATIC_CATEGORIES = [
+  'Образование',
+  'Инфраструктура',
+  'События',
+  'Соц. проекты',
+  'Экология',
+  'Другое'
+]
+
 export default function IdeaList() {
+  const [ideas, setIdeas] = useState([])
   const [page, setPage] = useState(1)
+  const [dbCategories, setDbCategories] = useState([])
   const [categoryFilter, setCategoryFilter] = useState('')
   const [searchTerm, setSearchTerm] = useState('')
-  const [sortOrder, setSortOrder] = useState('')
+  const [loading, setLoading] = useState(false)
+  const PAGE_SIZE = 10
 
-  const { data: ideas = [], isLoading, error } = useIdeas({
-    categoryFilter: ['asc', 'desc'].includes(categoryFilter) ? '' : categoryFilter,
-    searchTerm,
-    page,
-    sortOrder: ['asc', 'desc'].includes(categoryFilter) ? categoryFilter : sortOrder
-  })
+  // Загрузка категорий
+  useEffect(() => {
+    supabase
+      .from('ideas')
+      .select('category', { distinct: true })
+      .then(({ data }) => {
+        const cats = Array.isArray(data)
+          ? data.map(r => r.category).filter(Boolean)
+          : []
+        setDbCategories(cats)
+      })
+  }, [])
 
-  const { data: categories = [] } = useCategories()
-  const voteMutation = useIdeaVoting()
+  const categories = Array.from(
+    new Set([...STATIC_CATEGORIES, ...dbCategories])
+  )
 
-  const handleVote = async (ideaId, voteValue) => {
-    try {
-      await voteMutation.mutateAsync({ ideaId, voteValue })
-    } catch (error) {
-      if (error.message === 'Требуется авторизация') {
-        alert('Чтобы голосовать, пожалуйста, войдите или зарегистрируйтесь.')
-      }
+  // Загрузка идей
+  const fetchIdeas = async () => {
+    setLoading(true)
+    const from = (page - 1) * PAGE_SIZE
+    const to = from + PAGE_SIZE - 1
+
+    let query = supabase
+      .from('ideas')
+      .select(
+        `id, content, category, created_at,
+         students!inner(firstname,lastname,faculty)`
+      , { count: 'exact' })
+      .order('created_at', { ascending: false })
+      .range(from, to)
+
+    if (categoryFilter && categoryFilter !== 'asc' && categoryFilter !== 'desc') {
+      query = query.eq('category', categoryFilter)
     }
+    if (searchTerm.trim()) query = query.ilike('content', `%${searchTerm.trim()}%`)
+
+    const { data, error } = await query
+    setLoading(false)
+    if (error) {
+      console.error('Error fetching ideas', error)
+      return
+    }
+
+    setIdeas(data || [])
   }
 
-  const handleFilterChange = (value) => {
-    setCategoryFilter(value)
-    setPage(1) // Сбрасываем на первую страницу при изменении фильтра
-  }
-
-  const handleSearchChange = (value) => {
-    setSearchTerm(value)
-    setPage(1)
-  }
-
-  if (error) {
-    return (
-      <div className={styles.emptyState}>
-        Ошибка загрузки идей: {error.message}
-      </div>
-    )
-  }
+  useEffect(() => {
+    fetchIdeas()
+  }, [page, categoryFilter, searchTerm])
 
   return (
     <div className={styles.container}>
@@ -58,12 +82,12 @@ export default function IdeaList() {
           type="text"
           placeholder="Поиск по тексту..."
           value={searchTerm}
-          onChange={e => handleSearchChange(e.target.value)}
+          onChange={e => { setSearchTerm(e.target.value); setPage(1) }}
           className={styles.searchInput}
         />
         <select
           value={categoryFilter}
-          onChange={e => handleFilterChange(e.target.value)}
+          onChange={e => { setCategoryFilter(e.target.value); setPage(1) }}
           className={styles.select}
         >
           <option value="">Все категории</option>
@@ -75,7 +99,7 @@ export default function IdeaList() {
         </select>
       </div>
 
-      {isLoading && (
+      {loading && (
         <div className={styles.listContainer}>
           {Array.from({ length: 5 }).map((_, index) => (
             <div key={index} className={styles.skeletonCard}>
@@ -87,7 +111,7 @@ export default function IdeaList() {
         </div>
       )}
 
-      {!isLoading && ideas.length === 0 && (
+      {!loading && ideas.length === 0 && (
         <div className={styles.emptyState}>
           {searchTerm || categoryFilter 
             ? "Идей по вашему запросу не найдено" 
@@ -95,33 +119,19 @@ export default function IdeaList() {
         </div>
       )}
 
-      {!isLoading && ideas.map(idea => (
+      {!loading && ideas.map(idea => (
         <div key={idea.id} className={styles.card}>
           <p className={styles.content}>{idea.content}</p>
           <p className={styles.metaText}>
             Категория: {idea.category || 'Без категории'}<br />
             Автор: {idea.students.firstname} {idea.students.lastname}, {idea.students.faculty}
           </p>
-          <div className={styles.voteButtons}>
-            <button
-              className={`${styles.voteButton} ${styles.likeButton} ${idea.myVote === 1 ? styles.active : ''}`}
-              onClick={() => handleVote(idea.id, 1)}
-              disabled={voteMutation.isLoading}
-              aria-label="Поддержать идею"
-            >
-              <HandThumbUpIcon className={styles.icon} />
-              <span className={styles.voteCount}>{idea.likes}</span>
-            </button>
-            <button
-              className={`${styles.voteButton} ${styles.dislikeButton} ${idea.myVote === -1 ? styles.active : ''}`}
-              onClick={() => handleVote(idea.id, -1)}
-              disabled={voteMutation.isLoading}
-              aria-label="Не поддерживаю идею"
-            >
-              <HandThumbDownIcon className={styles.icon} />
-              <span className={styles.voteCount}>{idea.dislikes}</span>
-            </button>
-          </div>
+          <IdeaVoting 
+            ideaId={idea.id}
+            initialLikes={0}
+            initialDislikes={0}
+            initialMyVote={0}
+          />
         </div>
       ))}
 
@@ -133,10 +143,9 @@ export default function IdeaList() {
         >
           ← Назад
         </button>
-        <span className={styles.pageInfo}>Страница {page}</span>
         <button
           className={styles.paginationButton}
-          disabled={ideas.length < 10}
+          disabled={ideas.length < PAGE_SIZE}
           onClick={() => setPage(p => p + 1)}
         >
           Вперед →

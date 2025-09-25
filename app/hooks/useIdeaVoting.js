@@ -24,7 +24,6 @@ export function useIdeaVoting() {
 
       if (existing) {
         if (existing.vote === voteValue) {
-          // Удаляем голос если кликаем на ту же кнопку
           await supabase
             .from('idea_votes')
             .delete()
@@ -32,7 +31,6 @@ export function useIdeaVoting() {
             .eq('user_id', userId)
           return { ideaId, newVote: 0, previousVote: voteValue }
         } else {
-          // Изменяем голос
           await supabase
             .from('idea_votes')
             .update({ vote: voteValue })
@@ -41,7 +39,6 @@ export function useIdeaVoting() {
           return { ideaId, newVote: voteValue, previousVote: existing.vote }
         }
       } else {
-        // Добавляем новый голос
         await supabase
           .from('idea_votes')
           .insert({ idea_id: ideaId, user_id: userId, vote: voteValue })
@@ -49,33 +46,30 @@ export function useIdeaVoting() {
       }
     },
     onMutate: async ({ ideaId, voteValue }) => {
-      // Отменяем текущие запросы чтобы не перезаписать оптимистичное обновление
+      // Отменяем текущие запросы
       await queryClient.cancelQueries({ queryKey: ['ideas'] })
 
-      // Сохраняем предыдущее состояние для отката
+      // Сохраняем предыдущее состояние
       const previousIdeas = queryClient.getQueryData(['ideas'])
 
-      // Оптимистичное обновление
-      queryClient.setQueryData(['ideas'], (old) => {
-        if (!old) return old
+      // МГНОВЕННОЕ обновление - синхронно
+      queryClient.setQueryData(['ideas'], (oldIdeas) => {
+        if (!oldIdeas) return oldIdeas
         
-        return old.map(idea => {
+        return oldIdeas.map(idea => {
           if (idea.id !== ideaId) return idea
 
           let { likes, dislikes, myVote } = idea
           
+          // Синхронное вычисление - сразу меняем UI
           if (myVote === voteValue) {
-            // Убираем голос
             if (voteValue === 1) likes--
             else dislikes--
             myVote = 0
           } else {
-            // Добавляем/изменяем голос
             if (myVote === 0) {
-              // Новый голос
               voteValue === 1 ? likes++ : dislikes++
             } else {
-              // Изменение голоса
               if (voteValue === 1) {
                 likes++
                 dislikes--
@@ -94,13 +88,17 @@ export function useIdeaVoting() {
       return { previousIdeas }
     },
     onError: (err, variables, context) => {
-      // Откатываем изменения при ошибке
+      // При ошибке возвращаем старые данные
       if (context?.previousIdeas) {
         queryClient.setQueryData(['ideas'], context.previousIdeas)
       }
+      
+      if (err.message === 'Требуется авторизация') {
+        alert('Чтобы голосовать, пожалуйста, войдите или зарегистрируйтесь.')
+      }
     },
     onSettled: () => {
-      // Инвалидируем кэш чтобы убедиться в актуальности данных
+      // После завершения обновляем данные с сервера
       queryClient.invalidateQueries({ queryKey: ['ideas'] })
     }
   })

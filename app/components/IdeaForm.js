@@ -23,23 +23,34 @@ export default function IdeaForm({ onSuccess }) {
   const [category, setCategory] = useState('')
   const [content, setContent] = useState('')
   const [loading, setLoading] = useState(false)
+  const [authLoading, setAuthLoading] = useState(true) // Новое состояние для загрузки авторизации
   const [error, setError] = useState('')
   const [formVisible, setFormVisible] = useState(false)
 
   // Получаем student_id текущего пользователя
   useEffect(() => {
     const fetchStudentId = async () => {
-      const { data: sessionData } = await supabase.auth.getSession()
-      const user = sessionData.session?.user
-      
-      if (user) {
-        const { data: studentData } = await supabase
-          .from('students')
-          .select('student_id')
-          .eq('auth_user_id', user.id)
-          .single()
-          
-        setStudentId(studentData?.student_id || null)
+      setAuthLoading(true)
+      try {
+        const { data: sessionData } = await supabase.auth.getSession()
+        const user = sessionData.session?.user
+        
+        if (user) {
+          const { data: studentData } = await supabase
+            .from('students')
+            .select('student_id')
+            .eq('auth_user_id', user.id)
+            .single()
+            
+          setStudentId(studentData?.student_id || null)
+        } else {
+          setStudentId(null)
+        }
+      } catch (error) {
+        console.error('Error fetching student ID:', error)
+        setStudentId(null)
+      } finally {
+        setAuthLoading(false)
       }
     }
 
@@ -53,7 +64,7 @@ export default function IdeaForm({ onSuccess }) {
         .from('ideas')
         .select('category', { distinct: true })
         
-      const cats = data.map(r => r.category).filter(Boolean)
+      const cats = data?.map(r => r.category).filter(Boolean) || []
       setDbCategories(cats)
     }
 
@@ -97,6 +108,19 @@ export default function IdeaForm({ onSuccess }) {
     } finally {
       setLoading(false)
     }
+  }
+
+  // Показываем загрузку пока проверяем авторизацию
+  if (authLoading) {
+    return (
+      <div className={styles.outerContainer}>
+        <div className={styles.buttonContainer}>
+          <button className={styles.submitButton} disabled>
+            Загрузка...
+          </button>
+        </div>
+      </div>
+    )
   }
 
   // Если пользователь не авторизован

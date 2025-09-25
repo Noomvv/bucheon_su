@@ -1,17 +1,17 @@
 // app/Ideas/page.js
 'use client'
 
+import { useState } from 'react'
 import IdeaForm from '../components/IdeaForm'
 import IdeaList from '../components/IdeaList'
 import styles from './page.module.css'
 
 export default function IdeasPage() {
+  const [refreshKey, setRefreshKey] = useState(0)
+
   return (
     <div>
-      {/* Форма для добавления новой идеи */}
-      <IdeaForm onSuccess={() => {
-        // React Query автоматически обновит данные через инвалидацию
-      }} />
+      <IdeaForm onSuccess={() => setRefreshKey(k => k + 1)} />
 
       <div className={styles.promoWrapper}>
         <img
@@ -26,8 +26,7 @@ export default function IdeasPage() {
         </div>
       </div>
 
-      {/* Список идей - теперь с кэшированием */}
-      <IdeaList />
+      <IdeaList key={refreshKey} />
     </div>
   )
 }
