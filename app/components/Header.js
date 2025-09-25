@@ -16,7 +16,7 @@ const pageData = {
   '/Personal': { title: 'Личный кабинет', icon: <UserIcon className={styles.icon} /> },
   '/Events': { title: 'События', icon: <CalendarIcon className={styles.icon} /> },
   '/Polls': { title: 'Опросы', icon: <ChartBarIcon className={styles.icon} /> },
-  '/Ideas': { title: 'Идеи', icon: <LightBulbIcon className={styles.icon} /> },
+  '/Ideas': { title: 'Ваши предложения', icon: <LightBulbIcon className={styles.icon} /> },
   '/Members': { title: 'Состав совета', icon: <UserGroupIcon className={styles.icon} /> },
   '/Volunteering': { title: 'Волонтерство', icon: <UserGroupIcon className={styles.icon} /> },
 };
