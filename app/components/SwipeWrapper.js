@@ -1,7 +1,9 @@
 'use client';
 
+import React, { useRef, useState } from 'react';
 import { useSwipeable } from 'react-swipeable';
 import { useRouter, usePathname } from 'next/navigation';
+import styles from './SwipeWrapper.module.css';
 
 const pages = [
   "/Volunteering",
@@ -16,26 +18,44 @@ export default function SwipeWrapper({ children }) {
   const pathname = usePathname();
   const currentIndex = pages.indexOf(pathname);
 
+  const [zoomClass, setZoomClass] = useState(styles.zoomActive);
+  const timeoutRef = useRef();
+
+  const handleSwipe = (dir) => {
+    setZoomClass(styles.zoomIn);
+    timeoutRef.current = setTimeout(() => {
+      router.push(
+        dir === 'left'
+          ? pages[currentIndex + 1]
+          : pages[currentIndex - 1]
+      );
+    }, 250);
+  };
+
+  React.useEffect(() => {
+    setZoomClass(styles.zoomIn);
+    const timer = setTimeout(() => {
+      setZoomClass(styles.zoomActive);
+    }, 50); // Короткая задержка для плавного появления
+    return () => {
+      clearTimeout(timer);
+      clearTimeout(timeoutRef.current);
+    };
+  }, [pathname]);
+
   const handlers = useSwipeable({
-    onSwipedLeft: () => {
-      if (currentIndex !== -1 && currentIndex < pages.length - 1) {
-        router.push(pages[currentIndex + 1]);
-      }
-    },
-    onSwipedRight: () => {
-      if (currentIndex > 0) {
-        router.push(pages[currentIndex - 1]);
-      }
-    },
+    onSwipedLeft: () => handleSwipe('left'),
+    onSwipedRight: () => handleSwipe('right'),
     trackMouse: true
   });
 
-  // Если текущая страница не в списке, не обрабатывать свайп
   if (currentIndex === -1) return <>{children}</>;
 
   return (
-    <div {...handlers}>
-      {children}
+    <div {...handlers} className={styles.swipeContainer}>
+      <div className={`${styles.slide} ${zoomClass}`}>
+        {children}
+      </div>
     </div>
   );
 }
