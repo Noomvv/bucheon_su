@@ -22,13 +22,17 @@ export default function SwipeWrapper({ children }) {
   const timeoutRef = useRef();
 
   const handleSwipe = (dir) => {
+    let nextIndex =
+      dir === 'left'
+        ? currentIndex + 1
+        : currentIndex - 1;
+
+    // Проверка: не выходить за границы массива
+    if (nextIndex < 0 || nextIndex >= pages.length) return;
+
     setZoomClass(styles.zoomIn);
     timeoutRef.current = setTimeout(() => {
-      router.push(
-        dir === 'left'
-          ? pages[currentIndex + 1]
-          : pages[currentIndex - 1]
-      );
+      router.push(pages[nextIndex]);
     }, 250);
   };
 
