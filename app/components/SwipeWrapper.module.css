@@ -13,6 +13,3 @@
   opacity: 1;
 }
 
-/* Удалены все transition и transform для анимаций */
-.zoomIn { }
-.zoomActive { }
