@@ -73,7 +73,7 @@
 .telegramLink {
   display: flex;
   align-items: center;
-  color: var(--text-color);
+  color: rgb(14, 14, 149);
   font-size: 0.75rem;
   text-decoration: none;
 }
