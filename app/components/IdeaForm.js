@@ -1,6 +1,8 @@
+// app/components/IdeaForm.js
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 import { supabase } from '../../lib/supabaseClient'
 import Link from 'next/link'
 import styles from './IdeaForm.module.css'
@@ -15,28 +17,40 @@ const STATIC_CATEGORIES = [
 ]
 
 export default function IdeaForm({ onSuccess }) {
+  const queryClient = useQueryClient()
   const [studentId, setStudentId] = useState(null)
   const [dbCategories, setDbCategories] = useState([])
   const [category, setCategory] = useState('')
   const [content, setContent] = useState('')
   const [loading, setLoading] = useState(false)
+  const [authLoading, setAuthLoading] = useState(true) // Новое состояние для загрузки авторизации
   const [error, setError] = useState('')
-  const [formVisible, setFormVisible] = useState(false) // Управление видимостью формы
+  const [formVisible, setFormVisible] = useState(false)
 
   // Получаем student_id текущего пользователя
   useEffect(() => {
     const fetchStudentId = async () => {
-      const { data: sessionData } = await supabase.auth.getSession()
-      const user = sessionData.session?.user
-      
-      if (user) {
-        const { data: studentData } = await supabase
-          .from('students')
-          .select('student_id')
-          .eq('auth_user_id', user.id)
-          .single()
-          
-        setStudentId(studentData?.student_id || null)
+      setAuthLoading(true)
+      try {
+        const { data: sessionData } = await supabase.auth.getSession()
+        const user = sessionData.session?.user
+        
+        if (user) {
+          const { data: studentData } = await supabase
+            .from('students')
+            .select('student_id')
+            .eq('auth_user_id', user.id)
+            .single()
+            
+          setStudentId(studentData?.student_id || null)
+        } else {
+          setStudentId(null)
+        }
+      } catch (error) {
+        console.error('Error fetching student ID:', error)
+        setStudentId(null)
+      } finally {
+        setAuthLoading(false)
       }
     }
 
@@ -50,7 +64,7 @@ export default function IdeaForm({ onSuccess }) {
         .from('ideas')
         .select('category', { distinct: true })
         
-      const cats = data.map(r => r.category).filter(Boolean)
+      const cats = data?.map(r => r.category).filter(Boolean) || []
       setDbCategories(cats)
     }
 
@@ -82,13 +96,31 @@ export default function IdeaForm({ onSuccess }) {
       
       setContent('')
       setCategory('')
-      setFormVisible(false) // Скрываем форму после успешной отправки
+      setFormVisible(false)
+      
+      // Инвалидируем кэш идей чтобы обновить список
+      queryClient.invalidateQueries({ queryKey: ['ideas'] })
+      queryClient.invalidateQueries({ queryKey: ['ideaCategories'] })
+      
       onSuccess?.()
     } catch (err) {
       setError(err.message)
     } finally {
       setLoading(false)
     }
+  }
+
+  // Показываем загрузку пока проверяем авторизацию
+  if (authLoading) {
+    return (
+      <div className={styles.outerContainer}>
+        <div className={styles.buttonContainer}>
+          <button className={styles.submitButton} disabled>
+            Опубликовать идею
+          </button>
+        </div>
+      </div>
+    )
   }
 
   // Если пользователь не авторизован
@@ -112,7 +144,7 @@ export default function IdeaForm({ onSuccess }) {
       {!formVisible ? (
         <div className={styles.buttonContainer}>
           <button
-            onClick={() => setFormVisible(true)} // Показываем форму при нажатии
+            onClick={() => setFormVisible(true)}
             className={styles.submitButton}
           >
             Опубликовать идею
@@ -170,6 +202,14 @@ export default function IdeaForm({ onSuccess }) {
                 <span className={styles.buttonText}>Опубликовать идею</span>
               )}
             </button>
+            {/* <button
+              type="button"
+              onClick={() => setFormVisible(false)}
+              className={styles.cancelButton}
+              disabled={loading}
+            >
+              Отмена
+            </button> */}
           </div>
         </form>
       )}

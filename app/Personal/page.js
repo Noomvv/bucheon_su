@@ -1,125 +1,57 @@
 // app/Personal/page.js
 'use client'
 
-import { useState, useEffect } from 'react'
-import { supabase } from '../../lib/supabaseClient'
+import { useEffect } from 'react'
+import { supabase } from '../../lib/supabaseClient' // Добавьте этот импорт
+import { queryClient } from '../providers' // Импортируем queryClient
+import { useSession, useStudentData, useStats, useNotifications } from '../hooks/usePersonalData'
 import AuthForm from '../components/AuthForm'
-import LogoutButton from '../components/LogoutButton'
 import StatsPanel from '../components/StatsPanel'
 import NotificationsBell from '../components/NotificationsBell'
+import LoadingSpinner from '../components/LoadingSpinner'
 import styles from './page.module.css'
 
-const LIKE_THRESHOLD = 100
-
 export default function PersonalPage() {
-  const [sessionChecked, setSessionChecked] = useState(false)
-  const [session, setSession] = useState(null)
-  const [student, setStudent] = useState(null)
-  const [studentId, setStudentId] = useState(null)
-  const [stats, setStats] = useState({ 
-    ideasCount: 0, 
-    totalLikes: 0, 
-    volunteerHours: 0
-  })
-  const [notifications, setNotifications] = useState([])
+  const { data: session, isLoading: sessionLoading } = useSession()
+  const { data: student, isLoading: studentLoading } = useStudentData(session)
+  const { data: stats = { ideasCount: 0, totalLikes: 0, volunteerHours: 0 } } = useStats(student?.student_id)
+  const { data: notifications = [] } = useNotifications(student?.student_id)
 
+  // Подписка на изменения авторизации
   useEffect(() => {
-    let mounted = true
-
-    const handleSession = async (session) => {
-      if (!mounted) return
-      setSession(session)
-      setSessionChecked(true)
-
-      if (!session) {
-        setStudent(null)
-        setStudentId(null)
-        setStats({ ideasCount: 0, totalLikes: 0, volunteerHours: 0 })
-        setNotifications([])
-        return
-      }
-
-      // Получаем полные данные студента включая Telegram
-      const { data: stud } = await supabase
-        .from('students')
-        .select('*')
-        .eq('auth_user_id', session.user.id)
-        .single()
-
-      if (!mounted || !stud) return
-      
-      setStudent({ 
-        firstname: stud.firstname, 
-        lastname: stud.lastname,
-        telegram_username: stud.telegram_username,
-        phone_number: stud.phone_number,
-        registration_date: stud.registration_date,
-        faculty: stud.faculty,
-        enrollment_year: stud.enrollment_year
-      })
-      setStudentId(stud.student_id)
-
-      // Загрузка статистики идей
-      const { data: ideas } = await supabase
-        .from('ideas')
-        .select('student_id, content, idea_votes(vote)')
-      
-      if (ideas) {
-        const likesMap = {}
-        ideas.forEach(i => {
-          const c = i.idea_votes.filter(v => v.vote === 1).length
-          likesMap[i.student_id] = (likesMap[i.student_id] || 0) + c
-        })
-
-        const ideasCount = ideas.filter(i => i.student_id === stud.student_id).length
-        const totalLikes = likesMap[stud.student_id] || 0
-
-        // Загрузка часов волонтерства
-        const { data: volunteer } = await supabase
-          .from('volunteers')
-          .select('total_hours')
-          .eq('student_id', stud.student_id)
-          .single()
-
-        const volunteerHours = volunteer?.total_hours || 0
-
-        const notes = ideas
-          .filter(i => i.student_id === stud.student_id)
-          .filter(i => i.idea_votes.filter(v => v.vote === 1).length >= LIKE_THRESHOLD)
-          .map(i => `Ваша идея «${i.content}» набрала ${LIKE_THRESHOLD}+ лайков и отправлена на рассмотрение.`)
-
-        setStats({ ideasCount, totalLikes, volunteerHours })
-        setNotifications(notes)
-      }
-    }
-
-    supabase.auth.getSession().then(({ data }) => {
-      handleSession(data.session)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(() => {
+      // При изменении авторизации инвалидируем кэш
+      queryClient.invalidateQueries({ queryKey: ['session'] })
     })
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        handleSession(session)
-      }
-    )
-
-    return () => {
-      mounted = false
-      subscription.unsubscribe()
-    }
+    return () => subscription.unsubscribe()
   }, [])
 
-  if (!sessionChecked) return <div className={styles.loadingContainer}>Загрузка...</div>
+  if (sessionLoading) {
+    return <LoadingSpinner />
+  }
 
-  if (!session) return (
-    <div className={styles.authContainer}>
-      <div className={styles.authCard}>
-        <AuthForm />
+  if (!session) {
+    return (
+      <div className={styles.authContainer}>
+        <div className={styles.authCard}>
+          <AuthForm />
+        </div>
       </div>
-    </div>
-  )
+    )
+  }
 
-  if (!student) return <div className={styles.loadingContainer}>Загрузка данных студента...</div>
+  if (studentLoading) {
+    return <LoadingSpinner />
+  }
+
+  if (!student) {
+    return (
+      <div className={styles.errorContainer}>
+        <p>Ошибка загрузки данных студента</p>
+      </div>
+    )
+  }
 
   // Форматируем дату регистрации
   const formatDate = (dateString) => {
@@ -197,11 +129,6 @@ export default function PersonalPage() {
             </div>
           </div>
         )}
-
-        {/* Logout Block */}
-        {/* <div className={styles.logoutBlock}>
-          <LogoutButton />
-        </div> */}
       </div>
     </div>
   )
