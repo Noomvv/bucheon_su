@@ -2,33 +2,46 @@
 'use client'
 
 import { useEffect } from 'react'
-import { supabase } from '../../lib/supabaseClient' // Добавьте этот импорт
-import { queryClient } from '../providers' // Импортируем queryClient
+import { supabase } from '../../lib/supabaseClient'
+import { useQueryClient } from '@tanstack/react-query'
 import { useSession, useStudentData, useStats, useNotifications } from '../hooks/usePersonalData'
 import AuthForm from '../components/AuthForm'
 import StatsPanel from '../components/StatsPanel'
 import NotificationsBell from '../components/NotificationsBell'
-import LoadingSpinner from '../components/LoadingSpinner'
+import UserProfileSkeleton from '../components/UserProfileSkeleton'
+import StatsPanelSkeleton from '../components/StatsPanelSkeleton'
+import VolunteerMessageSkeleton from '../components/VolunteerMessageSkeleton'
 import styles from './page.module.css'
 
 export default function PersonalPage() {
+  const queryClient = useQueryClient()
   const { data: session, isLoading: sessionLoading } = useSession()
   const { data: student, isLoading: studentLoading } = useStudentData(session)
-  const { data: stats = { ideasCount: 0, totalLikes: 0, volunteerHours: 0 } } = useStats(student?.student_id)
+  const { data: stats, isLoading: statsLoading } = useStats(student?.student_id)
   const { data: notifications = [] } = useNotifications(student?.student_id)
 
   // Подписка на изменения авторизации
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(() => {
-      // При изменении авторизации инвалидируем кэш
       queryClient.invalidateQueries({ queryKey: ['session'] })
     })
 
     return () => subscription.unsubscribe()
-  }, [])
+  }, [queryClient])
+
+  // Показываем скелет загрузки
+  const isLoading = sessionLoading || (session && studentLoading)
 
   if (sessionLoading) {
-    return <LoadingSpinner />
+    return (
+      <div className={styles.mainContainer}>
+        <div className={styles.contentContainer}>
+          <UserProfileSkeleton />
+          <StatsPanelSkeleton />
+          <VolunteerMessageSkeleton />
+        </div>
+      </div>
+    )
   }
 
   if (!session) {
@@ -41,8 +54,16 @@ export default function PersonalPage() {
     )
   }
 
-  if (studentLoading) {
-    return <LoadingSpinner />
+  if (isLoading) {
+    return (
+      <div className={styles.mainContainer}>
+        <div className={styles.contentContainer}>
+          <UserProfileSkeleton />
+          <StatsPanelSkeleton />
+          <VolunteerMessageSkeleton />
+        </div>
+      </div>
+    )
   }
 
   if (!student) {
@@ -113,21 +134,29 @@ export default function PersonalPage() {
         </div>
 
         {/* Stats Block */}
-        <StatsPanel
-          ideasCount={stats.ideasCount}
-          totalLikes={stats.totalLikes}
-          volunteerHours={stats.volunteerHours}
-        />
+        {statsLoading ? (
+          <StatsPanelSkeleton />
+        ) : (
+          <StatsPanel
+            ideasCount={stats?.ideasCount || 0}
+            totalLikes={stats?.totalLikes || 0}
+            volunteerHours={stats?.volunteerHours || 0}
+          />
+        )}
 
         {/* Top Message Block */}
-        {stats.volunteerHours > 0 && (
-          <div className={styles.topMessageBlock}>
-            <div className={styles.topMessageContent}>
-              {stats.volunteerHours >= 50 ? '🏆 Вы активный волонтер!' : 
-               stats.volunteerHours >= 20 ? '👍 Спасибо за вашу помощь!' :
-               '🌟 Вы начинающий волонтер!'}
+        {statsLoading ? (
+          <VolunteerMessageSkeleton />
+        ) : (
+          stats?.volunteerHours > 0 && (
+            <div className={styles.topMessageBlock}>
+              <div className={styles.topMessageContent}>
+                {stats.volunteerHours >= 50 ? '🏆 Вы активный волонтер!' : 
+                 stats.volunteerHours >= 20 ? '👍 Спасибо за вашу помощь!' :
+                 '🌟 Вы начинающий волонтер!'}
+              </div>
             </div>
-          </div>
+          )
         )}
       </div>
     </div>

@@ -1,0 +1,79 @@
+/* app/components/UserProfileSkeleton.module.css */
+.skeletonContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 20px;
+  background: var(--bg-color);
+  border-radius: 12px;
+  margin-bottom: 20px;
+}
+
+.headerSkeleton {
+  flex: 1;
+}
+
+.greetingSkeleton {
+  width: 200px;
+  height: 24px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  border-radius: 6px;
+  margin-bottom: 12px;
+  animation: shimmer 1.5s infinite;
+}
+
+.nameSkeleton {
+  width: 300px;
+  height: 32px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  animation: shimmer 1.5s infinite;
+}
+
+.contactInfoSkeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.contactItemSkeleton {
+  width: 250px;
+  height: 18px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  border-radius: 4px;
+  animation: shimmer 1.5s infinite;
+}
+
+.contactItemSkeleton:nth-child(2) {
+  width: 200px;
+}
+
+.contactItemSkeleton:nth-child(3) {
+  width: 280px;
+}
+
+.contactItemSkeleton:nth-child(4) {
+  width: 220px;
+}
+
+.notificationSkeleton {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  border-radius: 50%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
